@@ -1,0 +1,22 @@
+{
+	"name": "woodynadobhar/biollante",
+	"description": "Laravel scaffolding generator",
+	"type": "library",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Biollante\\": "src/"
+		}
+	},
+	"require": {
+		"php": "^8.2",
+		"illuminate/support": "^10|^11"
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Biollante\\BiollanteServiceProvider"
+			]
+		}
+	}
+}
