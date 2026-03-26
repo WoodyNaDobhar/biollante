@@ -69,30 +69,31 @@ class APIControllerGenerator extends BaseGenerator
 			$templateType = 'generator';
 		}
 
+		// Load organizer roles from config
+		$organizerRoles = config('biollante.roles.organizer_roles', []);
+
 		$variables = [];
 		foreach ($methods as $method) {
 			
 			$permVisitors = 'None';
 			$permUsers = 'None';
-			$permChapterOrganizers = 'None';
-			$permCollectiveOrganizers = 'None';
-			$permTeamOrganizers = 'None';
-			$permThreadOrganizers = 'None';
-			$permVendorOrganizers = 'None';
-			$permWorldOrganizers = 'None';
 			$permAdmins = 'None';
 			$routeKeyVars = $this->swaggerRouteKeyVars();
+
+			// Build organizer permissions dynamically
+			$organizerPermissions = [];
+			foreach ($organizerRoles as $role) {
+				$organizerPermissions[$role] = 'None';
+			}
 			
 			if($method !== 'controller'){
 				$permVisitors = $this->generatePermissions(null, $method);
 				$permUsers = $this->generatePermissions('User', $method);
-				$permChapterOrganizers = $this->generatePermissions('Chapter Organizer', $method);
-				$permCollectiveOrganizers = $this->generatePermissions('Collective Organizer', $method);
-				$permTeamOrganizers = $this->generatePermissions('Team Organizer', $method);
-				$permThreadOrganizers = $this->generatePermissions('Thread Organizer', $method);
-				$permVendorOrganizers = $this->generatePermissions('Vendor Organizer', $method);
-				$permWorldOrganizers = $this->generatePermissions('World Organizer', $method);
 				$permAdmins = $this->generatePermissions('Admin', $method);
+
+				foreach ($organizerRoles as $role) {
+					$organizerPermissions[$role] = $this->generatePermissions($role . ' Organizer', $method);
+				}
 			}
 
 			$variable = 'doc' . Str::title($method);
@@ -100,13 +101,8 @@ class APIControllerGenerator extends BaseGenerator
 				'config'					=> $this->config,
 				'permVisitors'				=> $permVisitors,
 				'permUsers'					=> $permUsers,
-				'permChapterOrganizers'		=> $permChapterOrganizers,
-				'permCollectiveOrganizers'	=> $permCollectiveOrganizers,
-				'permTeamOrganizers'		=> $permTeamOrganizers,
-				'permThreadOrganizers'		=> $permThreadOrganizers,
-				'permVendors'				=> $permVendorOrganizers,
-				'permWorldOrganizers'		=> $permWorldOrganizers,
 				'permAdmins'				=> $permAdmins,
+				'organizerPermissions'		=> $organizerPermissions,
 				'relations'					=> $relationsText
 			], $routeKeyVars))->render();
 		}
@@ -192,9 +188,7 @@ class APIControllerGenerator extends BaseGenerator
 		foreach ($this->config->fields as $field) {
 			if (
 				$field &&
-				($field->name ?? null) === 'slug' &&
-				isset($field->fieldDetails) &&
-				empty($field->fieldDetails->is_virtual)
+				($field->name ?? null) === 'slug'
 			) {
 				return true;
 			}
@@ -205,21 +199,20 @@ class APIControllerGenerator extends BaseGenerator
 
 	protected function swaggerRouteKeyVars(): array
 	{
-		$hasSlug = $this->hasSlugField();
+		$routeKeyName = $this->hasSlugField() ? 'slug' : 'id';
+		$routeKeyType = $this->hasSlugField() ? 'string' : 'integer';
+		$routeKeyDescription = $this->hasSlugField()
+			? 'The slug of the ' . $this->config->modelNames->name
+			: 'The ID of the ' . $this->config->modelNames->name;
+		$routeKeyExample = $this->hasSlugField() ? 'example-slug' : 1;
+		$routeKeyExampleIsString = $this->hasSlugField();
 
 		return [
-			// what your api routes now use: /accounts/{account}
-			'routeKeyName' => $this->config->modelNames->camel,
-
-			// swagger schema type for the path param
-			'routeKeyType' => $hasSlug ? 'string' : 'integer',
-
-			// lets swagger show the truth
-			'routeKeyDescription' => ($hasSlug ? 'ID or slug of ' : 'ID of ') . $this->config->modelNames->name,
-
-			// used for correct quoting in blade
-			'routeKeyExample' => $hasSlug ? 'example-slug' : '42',
-			'routeKeyExampleIsString' => $hasSlug,
+			'routeKeyName' => $routeKeyName,
+			'routeKeyType' => $routeKeyType,
+			'routeKeyDescription' => $routeKeyDescription,
+			'routeKeyExample' => $routeKeyExample,
+			'routeKeyExampleIsString' => $routeKeyExampleIsString,
 		];
 	}
 

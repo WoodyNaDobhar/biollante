@@ -112,7 +112,7 @@ class ModelGenerator extends BaseGenerator
 
 	protected function customSoftDelete()
 	{
-		$deletedAt = config('laravel_generator.timestamps.deleted_at', 'deleted_at');
+		$deletedAt = config('biollante.timestamps.deleted_at', 'deleted_at');
 
 		if ($deletedAt === 'deleted_at') {
 			return null;
@@ -123,7 +123,7 @@ class ModelGenerator extends BaseGenerator
 
 	protected function customCreatedAt()
 	{
-		$createdAt = config('laravel_generator.timestamps.created_at', 'created_at');
+		$createdAt = config('biollante.timestamps.created_at', 'created_at');
 
 		if ($createdAt === 'created_at') {
 			return null;
@@ -134,7 +134,7 @@ class ModelGenerator extends BaseGenerator
 
 	protected function customUpdatedAt()
 	{
-		$updatedAt = config('laravel_generator.timestamps.updated_at', 'updated_at');
+		$updatedAt = config('biollante.timestamps.updated_at', 'updated_at');
 
 		if ($updatedAt === 'updated_at') {
 			return null;
@@ -153,7 +153,7 @@ class ModelGenerator extends BaseGenerator
 					!$field->fieldDetails->is_virtual && 
 					(
 						$field->name === 'password' ||
-						!in_array($field->name, config('laravel_generator.options.hidden_fields'))
+						!in_array($field->name, config('biollante.options.hidden_fields'))
 					)
 				) {
 					$fillables[] = "'".$field->name."'";
@@ -173,7 +173,7 @@ class ModelGenerator extends BaseGenerator
 					$field->isNotNull &&
 					$field->isFillable && 
 					!$field->fieldDetails->is_virtual && 
-					!in_array($field->name, config('laravel_generator.options.hidden_fields'))
+					!in_array($field->name, config('biollante.options.hidden_fields'))
 				) {
 					$required[] = "'".$field->name."'";
 				}
@@ -188,7 +188,7 @@ class ModelGenerator extends BaseGenerator
 		$hidden = [];
 		if (isset($this->config->fields) && !empty($this->config->fields)) {
 			foreach ($this->config->fields as $field) {
-				if (in_array($field->name, config('laravel_generator.options.hidden_fields'))) {
+				if (in_array($field->name, config('biollante.options.hidden_fields'))) {
 					$hidden[] = "'".$field->name."'";
 				}
 			}

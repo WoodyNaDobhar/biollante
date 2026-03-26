@@ -78,7 +78,7 @@ class TableFieldsGenerator
 
 		$this->primaryKey = $this->getPrimaryKeyOfTable($tableName);
 		$this->timestamps = static::getTimestampFieldNames();
-		$this->defaultSearchable = config('laravel_generator.options.tables_searchable_default', false);
+		$this->defaultSearchable = config('biollante.options.tables_searchable_default', false);
 	}
 
 	/**
@@ -139,7 +139,7 @@ class TableFieldsGenerator
 			if (strtolower($field->name) == 'password') {
 				$field->htmlType = 'password';
 				$field->isSearchable = false;
-			} elseif (in_array($field->name, config('laravel_generator.options.hidden_fields'))) {
+			} elseif (in_array($field->name, config('biollante.options.hidden_fields'))) {
 				$field->isSearchable = false;
 			}elseif (strtolower($field->name) == 'email') {
 				$field->htmlType = 'email';
@@ -266,16 +266,16 @@ class TableFieldsGenerator
 	 */
 	public static function getTimestampFieldNames()
 	{
-		if (!config('laravel_generator.timestamps.enabled', true)) {
+		if (!config('biollante.timestamps.enabled', true)) {
 			return [];
 		}
 
-		$createdAtName = config('laravel_generator.timestamps.created_at', 'created_at');
-		$createdByName = config('laravel_generator.timestamps.created_by', 'created_by');
-		$updatedAtName = config('laravel_generator.timestamps.updated_at', 'updated_at');
-		$updatedByName = config('laravel_generator.timestamps.updated_by', 'updated_by');
-		$deletedAtName = config('laravel_generator.timestamps.deleted_at', 'deleted_at');
-		$deletedByName = config('laravel_generator.timestamps.deleted_by', 'deleted_by');
+		$createdAtName = config('biollante.timestamps.created_at', 'created_at');
+		$createdByName = config('biollante.timestamps.created_by', 'created_by');
+		$updatedAtName = config('biollante.timestamps.updated_at', 'updated_at');
+		$updatedByName = config('biollante.timestamps.updated_by', 'updated_by');
+		$deletedAtName = config('biollante.timestamps.deleted_at', 'deleted_at');
+		$deletedByName = config('biollante.timestamps.deleted_by', 'deleted_by');
 
 		return [$createdAtName, $createdByName, $updatedAtName, $updatedByName, $deletedAtName, $deletedByName];
 	}
@@ -536,7 +536,7 @@ class TableFieldsGenerator
 		$databaseName = DB::getDatabaseName();
 
 		// Step 1: Fetch all tables in the database
-		$excludedTablesArray = config('laravel_generator.options.excluded_tables', []);
+		$excludedTablesArray = config('biollante.options.excluded_tables', []);
 		$excludedTables = implode(',', array_fill(0, count($excludedTablesArray), '?'));
 		$notLikeConditions = [];
 		$notLikeClause = '';

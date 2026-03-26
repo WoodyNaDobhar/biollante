@@ -13,7 +13,7 @@ class RepositoryTestGenerator extends BaseGenerator
 	{
 		parent::__construct();
 		$this->config = $config;
-		$this->path = config('laravel_generator.path.repository_test', base_path('tests/Repositories/'));
+		$this->path = config('biollante.path.repository_test', base_path('tests/Repositories/'));
 		$this->fileName = $this->config->modelNames->name.'RepositoryTest.php';
 	}
 

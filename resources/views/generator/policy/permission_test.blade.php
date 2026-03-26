@@ -36,14 +36,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 	
 	private static function getOrganizerRoles(): array
 	{
-		return [
-			'Chapter',
-			'Collective',
-			'Team',
-			'Thread',
-			'Vendor',
-			'World',
-		];
+		return config('biollante.roles.organizer_roles', []);
 	}
 
 	protected function setUp(): void

@@ -7,7 +7,7 @@
 	 *	summary="create{{ $config->modelNames->name }}",
 	 *	security=@if($permVisitors === 'Full'){}@else@{{"bearer_token":{}}}@endif,
 	 *	tags={"{{ $config->modelNames->name }}"},
-	 *	description="Create {{ $config->modelNames->name }}<br><b>Access</b>:<br>Visitors: {{$permVisitors}}<br>Users: {{$permUsers}}<br>Thread Organizers: {{$permUsers}}<br>Chapter Organizers: {{$permChapterOrganizers}}<br>Collective Organizers: {{$permCollectiveOrganizers}}<br>Team Organizers: {{$permTeamOrganizers}}<br>Vendor Organizers: {{$permVendors}}<br>World Organizers: {{$permWorldOrganizers}}<br>Admins: {{$permAdmins}}<br>{{ $relations }}",
+	 *	description="Create {{ $config->modelNames->name }}<br><b>Access</b>:<br>Visitors: {{$permVisitors}}<br>Users: {{$permUsers}}<br>@foreach($organizerPermissions as $roleName => $perm){{ $roleName }} Organizers: {{$perm}}<br>@endforeach Admins: {{$permAdmins}}<br>{{ $relations }}",
 	 *	requestBody={"$ref": "#/components/requestBodies/{{ $config->modelNames->name }}"},
 	 *	@OA\Response(
 	 *		response=200,

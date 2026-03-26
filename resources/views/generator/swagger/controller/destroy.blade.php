@@ -7,7 +7,7 @@
 	*	summary="delete{{ $config->modelNames->name }}",
 	*	security=@if($permVisitors === 'Full'){}@else@{{"bearer_token":{}}}@endif,
 	*	tags={"{{ $config->modelNames->name }}"},
-	*	description="Delete {{ $config->modelNames->name }}<br><b>Access</b>:<br>Visitors: {{$permVisitors}}<br>Users: {{$permUsers}}<br>Thread Organizers: {{$permUsers}}<br>Chapter Organizers: {{$permChapterOrganizers}}<br>Collective Organizers: {{$permCollectiveOrganizers}}<br>Team Organizers: {{$permTeamOrganizers}}<br>Vendor Organizers: {{$permVendors}}<br>World Organizers: {{$permWorldOrganizers}}<br>Admins: {{$permAdmins}}",
+	*	description="Delete {{ $config->modelNames->name }}<br><b>Access</b>:<br>Visitors: {{$permVisitors}}<br>Users: {{$permUsers}}<br>@foreach($organizerPermissions as $roleName => $perm){{ $roleName }} Organizers: {{$perm}}<br>@endforeach Admins: {{$permAdmins}}",
 	*	@OA\Parameter(
 	*		in="path",
 	*		name="{{ $routeKeyName }}",

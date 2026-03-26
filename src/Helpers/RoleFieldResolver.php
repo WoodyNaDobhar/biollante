@@ -16,14 +16,7 @@ class RoleFieldResolver
 	
 	const TYPE_OWN = 'Own';
 	const TYPE_RELATED = 'Related';
-	private static array $organizerRoles = [
-		'Chapter',
-		'Collective',
-		'Team',
-		'Thread',
-		'Vendor',
-		'World',
-	];
+	private static ?array $organizerRoles = null;
 	private static array $columnCache = [];
 
 	/**
@@ -116,7 +109,7 @@ class RoleFieldResolver
 		self::bootLaravelIfNeeded();
 		$fields = [];
 		$baseRole = Str::snake(Str::before($role, ' Organizer'));
-		$organizerRoles = self::$organizerRoles;
+		$organizerRoles = self::getOrganizerRoles();
 		// fresh self::logDebugInfo($currentTable, $role, $type, $currentTable);
 		// fresh self::logDebugInfo($currentTable, $role, $type, $currentPath);
 		// fresh self::logDebugInfo($currentTable, $role, $type, $role);
@@ -200,7 +193,7 @@ class RoleFieldResolver
 			)
 			 ||
 
-			// see: Missing related paths issue chat of ELF Development project
+			// see: Missing related paths issue of ELF Development
 			// we commented the above out because the Related descendant walk was over-matching and slow.
 			// The longer memory-jogger:
 			// Security overreach: the Case-5 descendant sweep was granting updateRelated/removeRelated through very loose multi-hop paths (mtm + polymorphics). On high-degree tables like files, organizers were picking up rights via chains like files -> campaigns -> owner -> teamable (or similar) even when one or more links were nullable or not actually scoping to their org. We saw tests where organizers got rights to unrelated files.
@@ -274,7 +267,7 @@ class RoleFieldResolver
 		// Remove mt1 relationships where the field in $tableName ($relation->inputs[1]) is nullable and it's not the parent
 		$parent = empty($currentPath) ? null : explode('->', $currentPath)[0];
 
-		$organizerRoles = self::$organizerRoles;
+		$organizerRoles = self::getOrganizerRoles();
 
 		$filteredRelations = collect($relations)
 			->filter(fn($relation) => in_array($relation->type, ['mt1','1t1','morphTo']))
@@ -672,7 +665,7 @@ class RoleFieldResolver
 		// fresh self::logDebugInfo($tableName, $role, $type, $relations);
 
 		// Process and return an associative array with relation names as keys and table names as values
-		$organizerRoles = self::$organizerRoles;
+		$organizerRoles = self::getOrganizerRoles();
 		$filteredRelations = collect($relations)
 			->filter(fn($relation) => in_array($relation->type, ['1tm', 'mtm', 'morphMany', 'hmt'])); // Keep only plural relations;
 	
@@ -758,7 +751,7 @@ class RoleFieldResolver
 			return [];
 		}
 
-		$organizerRoles = self::$organizerRoles;
+		$organizerRoles = self::getOrganizerRoles();
 		
 		// if $type doesn't match $role, skip this one
 		if(
@@ -850,7 +843,30 @@ class RoleFieldResolver
 			$app = require_once $basePath . '/bootstrap/app.php';
 			$app->make(Kernel::class)->bootstrap();
 		}
-	}	
+	}
+
+	/**
+	 * Returns the list of organizer role base names.
+	 *
+	 * Reads from the published Biollante config ('biollante.roles.organizer_roles').
+	 * The result is cached for the lifetime of the process so the config lookup
+	 * only happens once, even across multiple async workers.
+	 *
+	 * Falls back to an empty array if the config key is missing, which will
+	 * cause Biollante to generate simpler policies with no organizer-scoped
+	 * permission checks.
+	 *
+	 * @return array<int, string>
+	 */
+	private static function getOrganizerRoles(): array
+	{
+		if (self::$organizerRoles === null) {
+			self::bootLaravelIfNeeded();
+			self::$organizerRoles = config('biollante.roles.organizer_roles', []);
+		}
+ 
+		return self::$organizerRoles;
+	}
 
 	/**
 	 * Logs debug information to a file specific to the current table, role, and permission type.

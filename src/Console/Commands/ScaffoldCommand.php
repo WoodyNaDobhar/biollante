@@ -290,7 +290,7 @@ class ScaffoldCommand extends Command
 			];
 		}
 		
-		$path = config('laravel_generator.path.schema_files', resource_path('model_schemas/'));
+		$path = config('biollante.path.schema_files', resource_path('model_schemas/'));
 
 		$fileName = $this->config->modelNames->name.'.json';
 		
@@ -353,7 +353,7 @@ protected function getDatabaseTables(): array
 		return array_filter($tables, function ($table) {
 			// Example: Exclude pivot tables and tables handled by packages
 			return Str::endsWith($table, ['s']) &&
-				!in_array($table, config('laravel_generator.options.excluded_tables', [])) &&
+				!in_array($table, config('biollante.options.excluded_tables', [])) &&
 				!in_array($table, [
 					'cache', 
 					'cache_locks', 

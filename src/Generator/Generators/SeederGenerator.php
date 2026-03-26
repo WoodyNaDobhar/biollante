@@ -24,7 +24,7 @@ class SeederGenerator extends BaseGenerator
 	public function generate()
 	{
 		//Skip the excluded
-		if(in_array($this->config->tableName, config('laravel_generator.options.excluded_seeds', []))){
+		if(in_array($this->config->tableName, config('biollante.options.excluded_seeds', []))){
 
 			$this->config->commandComment(BiollanteHelper::instance()->format_nl() . 'Seeder skipped');
 

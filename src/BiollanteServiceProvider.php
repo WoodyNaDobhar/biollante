@@ -3,6 +3,7 @@
 namespace Biollante;
 
 use Biollante\Console\Commands\ScaffoldCommand;
+use Biollante\Contracts\ScopeResolver;
 use Illuminate\Support\ServiceProvider;
 
 class BiollanteServiceProvider extends ServiceProvider
@@ -10,9 +11,19 @@ class BiollanteServiceProvider extends ServiceProvider
 	public function register(): void
 	{
 		$this->mergeConfigFrom(
-			__DIR__ . '/../config/laravel_generator.php',
-			'laravel_generator'
+			__DIR__ . '/../config/biollante.php',
+			'biollante'
 		);
+
+		$this->app->singleton(ScopeResolver::class, function ($app) {
+			$class = config('biollante.scope_resolver');
+
+			if (!$class) {
+				return null;
+			}
+
+			return $app->make($class);
+		});
 	}
 
 	public function boot(): void
@@ -21,8 +32,8 @@ class BiollanteServiceProvider extends ServiceProvider
 
 		if ($this->app->runningInConsole()) {
 			$this->publishes([
-				__DIR__ . '/../config/laravel_generator.php' => config_path('laravel_generator.php'),
-			], 'biollante-config');
+				__DIR__ . '/../config/biollante.php' => config_path('biollante.php'),
+			], 'biollante');
 
 			$this->publishes([
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/biollante'),
