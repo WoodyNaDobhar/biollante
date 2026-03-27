@@ -37,7 +37,6 @@ class GeneratorConfig
 
 	public $tableName;
 	public $tableComment;
-	public string $tableType;
 	public string $apiPrefix;
 	public $primaryName;
 	public $connection;
@@ -61,7 +60,6 @@ class GeneratorConfig
 		$this->loadModelNames();
 		$this->loadPrefixes();
 		$this->loadPaths();
-		$this->tableType = config('biollante.tables', 'blade');
 		$this->apiPrefix = config('biollante.api_prefix', 'api');
 		$this->loadNamespaces();
 		$this->prepareTable();
@@ -116,9 +114,7 @@ class GeneratorConfig
 	{
 		$prefixes = new GeneratorPrefixes();
 
-		$prefixes->route = config('biollante.prefixes.route', '');
 		$prefixes->namespace = config('biollante.prefixes.namespace', '');
-		$prefixes->view = config('biollante.prefixes.view', '');
 
 		$this->prefixes = $prefixes;
 	}
@@ -128,14 +124,9 @@ class GeneratorConfig
 		$paths = new GeneratorPaths();
 
 		$namespacePrefix = $this->prefixes->namespace;
-		$viewPrefix = $this->prefixes->view;
 
 		if (!empty($namespacePrefix)) {
 			$namespacePrefix .= '/';
-		}
-
-		if (!empty($viewPrefix)) {
-			$viewPrefix .= '/';
 		}
 
 		$paths->repository = config('biollante.path.repository', app_path('Repositories/')).$namespacePrefix;
@@ -158,11 +149,13 @@ class GeneratorConfig
 
 		$paths->permissionTests = config('biollante.path.permission_test', base_path('tests/Permissions/'));
 
+		$paths->repositoryTests = config('biollante.path.repository_test', base_path('tests/Repositories/'));
+
+		$paths->unitTests = config('biollante.path.unit_test', base_path('tests/Unit/'));
+
 		$paths->factory = config('biollante.path.factory', database_path('factories/'));
 
 		$paths->seeder = config('biollante.path.seeder', database_path('seeders/test/'));
-
-		$paths->viewProvider = config('biollante.path.view_provider', app_path('Providers/ViewServiceProvider.php'));
 
 		$paths->interfaces = config('biollante.path.interfaces', base_path('resources/@client/interfaces/'));
 
@@ -192,19 +185,12 @@ class GeneratorConfig
 		$namespaces->policy = config('biollante.namespace.policy', 'App\Policies').$prefix;
 		$namespaces->seeder = config('biollante.namespace.seeder', 'Database\Seeders').$prefix;
 		$namespaces->factory = config('biollante.namespace.factory', 'Database\Factories').$prefix;
-		$namespaces->dataTables = config('biollante.namespace.datatables', 'App\DataTables').$prefix;
-		$namespaces->livewireTables = config('biollante.namespace.livewire_tables', 'App\Http\Livewire');
 		$namespaces->modelExtend = config('biollante.model_extend_class', 'Illuminate\Database\Eloquent\Model');
 
 		$namespaces->apiController = config('biollante.namespace.api_controller', 'App\Http\Controllers\API').$prefix;
 		$namespaces->apiResource = config('biollante.namespace.api_resource', 'App\Http\Resources').$prefix;
 
 		$namespaces->apiRequest = config('biollante.namespace.api_request', 'App\Http\Requests\API').$prefix;
-
-		$namespaces->request = config('biollante.namespace.request', 'App\Http\Requests').$prefix;
-		$namespaces->requestBase = config('biollante.namespace.request', 'App\Http\Requests');
-		$namespaces->baseController = config('biollante.namespace.controller', 'App\Http\Controllers');
-		$namespaces->controller = config('biollante.namespace.controller', 'App\Http\Controllers').$prefix;
 
 		$namespaces->apiTests = config('biollante.namespace.api_test', 'Tests\APIs');
 		$namespaces->permissionTests = config('biollante.namespace.permission_test', 'Tests\Permissions');

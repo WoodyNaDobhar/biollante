@@ -27,29 +27,17 @@ return [
 
 	'path' => [
 
-		'migration'         => database_path('migrations/'),
-
 		'model'             => app_path('Models/'),
 
 		'policy'            => app_path('Policies/'),
 
-		'datatables'        => app_path('DataTables/'),
-
-		'livewire_tables'   => app_path('Http/Livewire/'),
-
 		'repository'        => app_path('Repositories/'),
-
-		'routes'            => base_path('routes/web.php'),
 
 		'api_routes'        => base_path('routes/api.php'),
 
 		'app_service_provider' => app_path('Providers/AppServiceProvider.php'),
 
-		'request'           => app_path('Http/Requests/'),
-
 		'api_request'       => app_path('Http/Requests/API/'),
-
-		'controller'        => app_path('Http/Controllers/'),
 
 		'api_controller'    => app_path('Http/Controllers/API/'),
 
@@ -59,25 +47,15 @@ return [
 
 		'seeder'            => database_path('seeders/Test/'),
 
-		'database_seeder'   => database_path('seeders/TestDatabaseSeeder.php'),
-
 		'factory'           => database_path('factories/'),
-
-		'view_provider'     => app_path('Providers/ViewServiceProvider.php'),
-
-		'tests'             => base_path('tests/'),
-
-		'repository_test'   => base_path('tests/Repositories/'),
 
 		'api_test'          => base_path('tests/APIs/'),
 
 		'permission_test'   => base_path('tests/Permissions/'),
 
+		'repository_test'   => base_path('tests/Repositories/'),
+
 		'unit_test'         => base_path('tests/Unit/'),
-
-		'views'             => resource_path('views/'),
-
-		'menu_file'         => resource_path('views/layouts/menu.blade.php'),
 
 		'interfaces'        => resource_path('@client/interfaces/'),
 
@@ -102,21 +80,13 @@ return [
 
 		'model'             => 'App\Models',
 
-		'datatables'        => 'App\DataTables',
-
-		'livewire_tables'   => 'App\Http\Livewire',
-
 		'policy'            => 'App\Policies',
 
 		'repository'        => 'App\Repositories',
 
-		'controller'        => 'App\Http\Controllers',
-
 		'api_controller'    => 'App\Http\Controllers\API',
 
 		'api_resource'      => 'App\Http\Resources',
-
-		'request'           => 'App\Http\Requests',
 
 		'api_request'       => 'App\Http\Requests\API',
 
@@ -222,32 +192,16 @@ return [
 	| Prefixes
 	|--------------------------------------------------------------------------
 	|
-	| Route, namespace, and view prefixes for organizing generated code
-	| into sub-directories (e.g. an admin panel).
+	| Namespace prefix for organizing generated code into sub-directories
+	| (e.g. an admin panel). This appends to all generated namespace and
+	| path values.
 	|
 	*/
 
 	'prefixes' => [
 
-		'route'     => '',  // e.g. 'admin' or 'admin.shipping'
-
 		'namespace' => '',  // e.g. 'Admin' or 'Admin\Shipping'
-
-		'view'      => '',  // e.g. 'admin' or 'admin/shipping'
 	],
-
-	/*
-	|--------------------------------------------------------------------------
-	| Table Types
-	|--------------------------------------------------------------------------
-	|
-	| The table rendering approach for generated views.
-	|
-	| Possible values: 'blade', 'datatables', 'livewire'
-	|
-	*/
-
-	'tables' => 'blade',
 
 	/*
 	|--------------------------------------------------------------------------

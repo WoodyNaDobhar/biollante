@@ -6,12 +6,9 @@ class GeneratorPaths
 {
 	public string $repository;
 	public string $model;
-	public string $dataTables;
-	public string $livewireTables;
+	public string $policy;
 	public string $factory;
 	public string $seeder;
-	public string $databaseSeeder;
-	public string $viewProvider;
 
 	public string $apiController;
 	public string $apiResource;
@@ -19,9 +16,12 @@ class GeneratorPaths
 	public string $apiRoutes;
 	public string $appServiceProvider;
 	public string $apiTests;
+	public string $permissionTests;
+	public string $repositoryTests;
+	public string $unitTests;
 
-	public string $controller;
-	public string $request;
-	public string $routes;
-	public string $views;
+	public string $interfaces;
+	public string $constants;
+	public string $tips;
+	public string $rules;
 }

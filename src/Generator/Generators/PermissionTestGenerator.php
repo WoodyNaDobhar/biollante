@@ -19,7 +19,7 @@ class PermissionTestGenerator extends BaseGenerator
 	{
 		parent::__construct();
 		$this->config = $config;
-		$this->path = config('biollante.path.permission_test', base_path('tests/Permissions/'));
+		$this->path = $this->config->paths->permissionTests;
 		$this->fileName = $this->config->modelNames->name.'PermissionsTest.php';
 	}
 

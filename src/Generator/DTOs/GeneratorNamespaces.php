@@ -7,8 +7,7 @@ class GeneratorNamespaces
 	public string $app;
 	public string $repository;
 	public string $model;
-	public string $dataTables;
-	public string $livewireTables;
+	public string $policy;
 	public string $modelExtend;
 
 	public string $seeder;
@@ -18,14 +17,9 @@ class GeneratorNamespaces
 	public string $apiResource;
 	public string $apiRequest;
 
-	public string $request;
-	public string $requestBase;
-	public string $controller;
-	public string $baseController;
-
 	public string $apiTests;
+	public string $permissionTests;
 	public string $repositoryTests;
 	public string $unitTests;
-	public string $testTraits;
 	public string $tests;
 }

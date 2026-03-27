@@ -1,14 +1,28 @@
 # Biollante
 
-A database-driven scaffolding generator for Laravel. Biollante reads your MySQL schema and generates a complete application stack: models, policies, API controllers, resources, routes, tests, TypeScript interfaces, validation rules, and Swagger documentation.
+A database-driven scaffolding generator for Laravel API backends. Biollante reads your MySQL schema and generates a complete API stack: models, policies, controllers, resources, routes, tests, TypeScript interfaces, validation rules, and Swagger documentation.
 
 > **Beta.** Biollante is under active development. It works and is used in production, but the API is not yet stable and the documentation is catching up with the code. Contributions and feedback are welcome, but expect rough edges.
 
-## What It Does
+## Philosophy
+
+Biollante generates **API backends**, not full-stack applications. It assumes your frontend is a separate concern — a Vue/React/Svelte SPA, a mobile app, or any other client that consumes a JSON API. There are no Blade views, no web controllers, no server-rendered HTML.
+
+This is a deliberate architectural choice. The generated stack is:
+
+- **API controllers** that return JSON via Laravel resources
+- **Sanctum-authenticated routes** sorted into public and protected groups
+- **Swagger/OpenAPI documentation** generated from the schema
+- **TypeScript interfaces and validation rules** for your frontend client
+- **Policies** with granular Full/Own/Related permission checks
+
+Everything is derived from the database: column types, nullability, foreign keys, enums, polymorphic patterns, comments, and constraints. The schema is the source of truth.
+
+## What It Generates
 
 Point Biollante at a database table (or all of them) and it generates:
 
-**Backend**
+**Backend (PHP/Laravel)**
 - Models with a wrapper/core/extension architecture
 - Policies with owner, related, and scoped permission checks
 - API controllers (with optional repository pattern)
@@ -18,12 +32,11 @@ Point Biollante at a database table (or all of them) and it generates:
 - Swagger/OpenAPI documentation annotations
 - Factories, seeders, and test scaffolding (API, permission, repository, and unit)
 
-**Frontend**
+**Frontend (TypeScript)**
 - TypeScript interfaces (full, simple, and super-simple variants)
 - Vuelidate validation rules with extension points
 - Field-level tooltip definitions
-
-Everything is derived from the database: column types, nullability, foreign keys, enums, polymorphic patterns, comments, and constraints. The schema is the source of truth.
+- Enum constant files
 
 ## Requirements
 
@@ -104,16 +117,20 @@ Feature toggles that control what gets generated:
 | `tests` | `true` | Generate test scaffolding |
 | `factory` | `true` | Generate model factories |
 | `seeder` | `true` | Generate test seeders |
+| `auditable` | `true` | Generate audit trail support (requires `owen-it/laravel-auditing`) |
+| `userstamps` | `true` | Generate userstamp support (requires `wildside/userstamps`) |
 | `excluded_tables` | `[]` | Tables to skip during generation |
 | `hidden_fields` | `[...]` | Fields hidden in API resources |
 
 ### Scoped Access
 
-Two keys control the permission architecture:
+Three keys control the permission architecture:
 
 **`organizer_roles`** — base names of entity types that have scoped organizer authority (e.g. `['Practice']` or `['Chapter', 'Collective', 'World']`). These drive permission path resolution and Swagger documentation. Set to `[]` if your app has no scoped roles.
 
 **`scope_resolver`** — fully qualified class name implementing `Biollante\Contracts\ScopeResolver`. This tells Biollante how your application links users to scoped entities at runtime. Set to `null` if your app doesn't use scoped access.
+
+**`parent_hierarchy`** — maps child entity types to their parents for cascading permission checks (e.g. authority over a Collective grants access to its Chapters). Set to `[]` if your app has no hierarchical entity relationships.
 
 ## Schema Conventions
 
@@ -164,7 +181,7 @@ Many-to-many relationships are inferred when a table contains exactly two foreig
 
 ### Enums
 
-Native MySQL ENUMs generate select inputs in frontend scaffolding and typed constants in TypeScript. For polymorphic `_type` columns, enum values must align with model naming. For regular enums, Biollante generates a TypeScript constants file.
+Native MySQL ENUMs generate typed constants in TypeScript. For polymorphic `_type` columns, enum values must align with model naming. For regular enums, Biollante generates a TypeScript constants file.
 
 ## Scoped Access
 

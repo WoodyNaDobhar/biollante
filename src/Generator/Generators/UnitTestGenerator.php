@@ -13,7 +13,7 @@ class UnitTestGenerator extends BaseGenerator
 	{
 		parent::__construct();
 		$this->config = $config;
-		$this->path = config('biollante.path.unit_test', base_path('tests/Units/'));
+		$this->path = $this->config->paths->unitTests;
 		$this->fileName = $this->config->modelNames->name.'UnitTest.php';
 	}
 
