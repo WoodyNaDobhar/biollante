@@ -273,7 +273,7 @@ class InterfacesGenerator extends BaseGenerator
 							case str_contains($part, 'Carbon'):
 								$types[] = 'string';
 								break;
-							case str_starts_with($part, '\\Biollante\\Models\\'):
+							case str_starts_with($part, '\\' . $this->config->namespaces->model . '\\'):
 								$types[] = class_basename($part);
 								break;
 							default:
@@ -457,7 +457,7 @@ class InterfacesGenerator extends BaseGenerator
 						$parts = array_map('trim', explode('|', $returnTypeFull));
 
 						foreach ($parts as $part) {
-							if (str_starts_with($part, '\\Biollante\\Models\\')) {
+							if (str_starts_with($part, '\\' . $this->config->namespaces->model . '\\')) {
 								$model = class_basename($part);
 								if (!empty($model) && $model !== $currentModelName) {
 									$models[] = $model;

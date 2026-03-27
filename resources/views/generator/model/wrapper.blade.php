@@ -2,10 +2,10 @@
 	echo '<?php'.PHP_EOL;
 @endphp
 
-namespace Biollante\Models;
+namespace {{ $config->namespaces->model }};
 
-use Biollante\Models\Core\{{ $config->modelNames->name }} as Core{{ $config->modelNames->name }};
-use Biollante\Models\Extensions\{{ $config->modelNames->name }}Extension;
+use {{ $config->namespaces->model }}\Core\{{ $config->modelNames->name }} as Core{{ $config->modelNames->name }};
+use {{ $config->namespaces->model }}\Extensions\{{ $config->modelNames->name }}Extension;
 
 @if(isset($swaggerDocs))
 {!! $swaggerDocs !!}

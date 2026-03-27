@@ -5,9 +5,9 @@
 namespace {{ $config->namespaces->policy }};
 
 use Biollante\Helpers\BiollanteHelper;
-use Biollante\Models\{{ $modelName }};
+use {{ $config->namespaces->model }}\{{ $modelName }};
 @if($modelName !== 'User')
-use Biollante\Models\User;
+use {{ $config->namespaces->model }}\User;
 @endif
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Support\Str;
@@ -19,7 +19,7 @@ class {{ $modelName }}Policy
 	/**
 	 * Perform pre-authorization checks.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
 	 * @param  string  $ability
 	 * @return void|bool
 	 */
@@ -33,7 +33,7 @@ class {{ $modelName }}Policy
 	/**
 	 * Determine whether the user can view any {{ Str::plural(Str::snake($modelName)) }}.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
 	 * @return mixed
 	 */
 	public function viewAny(?User $user)
@@ -50,7 +50,7 @@ class {{ $modelName }}Policy
 	/**
 	 * Determine whether the user can create {{ Str::plural(Str::snake($modelName)) }}.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
 	 * @return mixed
 	 */
 	public function create(?User $user)
@@ -103,8 +103,8 @@ class {{ $modelName }}Policy
 	/**
 	 * Determine whether the user can {{ $permType }} the {{ strtolower($modelName) }}.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
-	 * @param  \Biollante\Models\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
 	 * @return mixed
 	 */
 	public function {{ $permType }}(?User $user, {{ $modelName }} ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }})
@@ -198,7 +198,7 @@ class {{ $modelName }}Policy
 											$relationOrganizer->presideable_id === ${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!}_id
 										) ||
 										(
-											${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!} instanceof \Biollante\Models\Chapter && 
+											${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!} && in_array(class_basename(${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!}), array_keys(config('biollante.parent_hierarchy', []))) && 
 											isset(${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!}->{{ $config['parentField']->field }}) &&
 											$relationOrganizer->presideable_type === '{{ $config['parentField']->type }}' &&
 											$relationOrganizer->presideable_id === ${{ Str::singular(substr($relationField->path, 0, strrpos($relationField->path, '->'))) }}->{!! substr($relationField->path, strrpos($relationField->path, '->') + 2) !!}->{{ $config['parentField']->field }}
@@ -243,8 +243,8 @@ class {{ $modelName }}Policy
 	/**
 	 * Determine whether the user can restore the {{ strtolower($modelName) }}.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
-	 * @param  \Biollante\Models\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
 	 * @return mixed
 	 */
 	public function restore(?User $user, {{ $modelName }} ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }})
@@ -255,8 +255,8 @@ class {{ $modelName }}Policy
 	/**
 	 * Determine whether the user can permanently delete the {{ strtolower($modelName) }}.
 	 *
-	 * @param  \Biollante\Models\User|null  $user
-	 * @param  \Biollante\Models\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
+	 * @param  \{{ $config->namespaces->model }}\User|null  $user
+	 * @param  \{{ $config->namespaces->model }}\{{ $modelName }}  ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }}
 	 * @return mixed
 	 */
 	public function forceDelete(?User $user, {{ $modelName }} ${{ strtolower($modelName) . ($modelName === 'User' ? 'Target' : '') }})

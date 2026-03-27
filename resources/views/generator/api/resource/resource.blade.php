@@ -5,7 +5,7 @@
 namespace {{ $config->namespaces->apiResource }};
 
 use Biollante\Helpers\BiollanteHelper;
-use Biollante\Policies\{{ $config->modelNames->name }}Policy;
+use {{ $config->namespaces->policy }}\{{ $config->modelNames->name }}Policy;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
@@ -26,7 +26,7 @@ class {{ $config->modelNames->name }}Resource extends JsonResource
 	public function __construct($resource)
 	{
 		parent::__construct($resource);
-		$this->relationships = \Biollante\Models\{{ $config->modelNames->name }}::$relationships ?? [];
+		$this->relationships = \{{ $config->namespaces->model }}\{{ $config->modelNames->name }}::$relationships ?? [];
 	}
 
 	/**
@@ -77,7 +77,7 @@ class {{ $config->modelNames->name }}Resource extends JsonResource
 						if(array_key_exists($head, $this->relationships)){
 							break;
 						}
-						$headClass = 'Biollante\\Models\\' . Str::studly(Str::singular($head));
+						$headClass = '{{ str_replace("\\", "\\\\", $config->namespaces->model) }}\\' . Str::studly(Str::singular($head));
 						if(class_exists($headClass)){
 							break;
 						}
@@ -113,7 +113,7 @@ class {{ $config->modelNames->name }}Resource extends JsonResource
 						//	split withItems into model names vs aliases
 						foreach($withItems as $seg){
 							$segSingular = Str::singular($seg);
-							$segClass = 'Biollante\\Models\\' . Str::studly($segSingular);
+							$segClass = '{{ str_replace("\\", "\\\\", $config->namespaces->model) }}\\' . Str::studly($segSingular);
 							if (class_exists($segClass)) {
 								$modelNames[] = $seg;
 							} else {
@@ -122,7 +122,7 @@ class {{ $config->modelNames->name }}Resource extends JsonResource
 						}
 						//	iterate model-name segments; for each, look in that model's $relationships for any alias in this chain
 						foreach($modelNames as $modelSeg){
-							$modelFqcn = 'Biollante\\Models\\' . Str::studly(Str::singular($modelSeg));
+							$modelFqcn = '{{ str_replace("\\", "\\\\", $config->namespaces->model) }}\\' . Str::studly(Str::singular($modelSeg));
 
 							//	skip if the model doesn't declare relationships
 							if (!property_exists($modelFqcn, 'relationships')) {
@@ -180,12 +180,12 @@ class {{ $config->modelNames->name }}Resource extends JsonResource
 						// Handle MorphTo
 						if ($relationData['type'] === 'MorphTo' && $relation) {
 							$modelClass = get_class($relation);
-							$resourceClass = 'Biollante\\Http\\Resources\\' . class_basename($modelClass) . 'Resource';
+							$resourceClass = '{{ str_replace("\\", "\\\\", $config->namespaces->apiResource) }}\\' . class_basename($modelClass) . 'Resource';
 						}
 
 						// Handle non-polymorphic
 						elseif (!is_array($relationData['model'])) {
-							$resourceClass = 'Biollante\\Http\\Resources\\' . $relationData['model'] . 'Resource';
+							$resourceClass = '{{ str_replace("\\", "\\\\", $config->namespaces->apiResource) }}\\' . $relationData['model'] . 'Resource';
 						}
 
 						if (class_exists($resourceClass)) {

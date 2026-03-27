@@ -13,5 +13,8 @@ class GeneratorOptions
 	public bool $seeder;
 	public bool $swagger;
 	public bool $tests;
+	public bool $auditable;
+	public bool $userstamps;
 	public array $excludedFields;
+	public array $excludedTables;
 }

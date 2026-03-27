@@ -838,7 +838,7 @@ class RoleFieldResolver
 		try {
 			DB::connection()->getPdo();
 		} catch (\Exception $e) {
-			$basePath = '/var/www/html';
+			$basePath = dirname(__DIR__, 4);
 			require_once $basePath . '/vendor/autoload.php'; 
 			$app = require_once $basePath . '/bootstrap/app.php';
 			$app->make(Kernel::class)->bootstrap();
@@ -848,7 +848,7 @@ class RoleFieldResolver
 	/**
 	 * Returns the list of organizer role base names.
 	 *
-	 * Reads from the published Biollante config ('biollante.roles.organizer_roles').
+	 * Reads from the published Biollante config ('biollante.organizer_roles').
 	 * The result is cached for the lifetime of the process so the config lookup
 	 * only happens once, even across multiple async workers.
 	 *
@@ -862,7 +862,7 @@ class RoleFieldResolver
 	{
 		if (self::$organizerRoles === null) {
 			self::bootLaravelIfNeeded();
-			self::$organizerRoles = config('biollante.roles.organizer_roles', []);
+			self::$organizerRoles = config('biollante.organizer_roles', []);
 		}
  
 		return self::$organizerRoles;
@@ -888,7 +888,7 @@ class RoleFieldResolver
 		$line = $trace['line'] ?? 'unknown';
 		$file = $trace['file'] ?? 'unknown';
 
-		$logDir = '/var/www/html/storage/logs/async_debug';
+		$logDir = (function_exists('storage_path') ? storage_path('logs/async_debug') : dirname(__DIR__, 4) . '/storage/logs/async_debug');
 		if (!is_dir($logDir)) {
 			mkdir($logDir, 0777, true); // Ensure the directory exists
 		}

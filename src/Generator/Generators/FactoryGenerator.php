@@ -424,7 +424,7 @@ class FactoryGenerator extends BaseGenerator
 				}
 			}
 			if (!in_array($relation, $uniqueQualifiers) && ucfirst(Str::singular($this->config->tableName)) !== $relation) {
-				$uses .= BiollanteHelper::instance()->format_nl() . "use Biollante\\Models\\{$relation};";
+				$uses .= BiollanteHelper::instance()->format_nl() . "use " . $this->config->namespaces->model . "\\{$relation};";
 				$uniqueQualifiers[] = $relation;  // Mark qualifier as added
 			}
 		}

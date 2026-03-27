@@ -201,6 +201,20 @@ return [
 		],
 
 		'excluded_seeds'      => [],
+
+		/*
+		|----------------------------------------------------------------------
+		| Model Template Options
+		|----------------------------------------------------------------------
+		|
+		| Control which traits, interfaces, and base classes are used in
+		| generated models. Set any to false/null to disable.
+		|
+		*/
+
+		'auditable'           => true,
+
+		'userstamps'          => true,
 	],
 
 	/*
@@ -289,5 +303,26 @@ return [
 	*/
 
 	'scope_resolver' => null,
+
+	/*
+	|--------------------------------------------------------------------------
+	| Parent Hierarchy
+	|--------------------------------------------------------------------------
+	|
+	| Maps child entity types to their parent entity type and the foreign
+	| key field that connects them. This is used in generated policies to
+	| check whether an organizer's authority over a parent entity should
+	| cascade to its children.
+	|
+	| Format: 'ChildModel' => ['parent_type' => 'ParentModel', 'parent_field' => 'parent_model_id']
+	|
+	| Example for ELF: 'Chapter' => ['parent_type' => 'Collective', 'parent_field' => 'collective_id']
+	|
+	| Set to an empty array if your app has no hierarchical entity
+	| relationships that affect permission scoping.
+	|
+	*/
+
+	'parent_hierarchy' => [],
 
 ];

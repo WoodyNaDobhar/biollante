@@ -7,8 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Biollante\Generator\Common\GeneratorConfig;
-use Biollante\Generator\Common\GeneratorField;
-use Biollante\Generator\Common\GeneratorFieldRelation;
 use Biollante\Generator\Events\GeneratorFileCreated;
 use Biollante\Generator\Events\GeneratorFileCreating;
 use Biollante\Generator\Events\GeneratorFileDeleted;
@@ -29,10 +27,7 @@ use Biollante\Generator\Generators\UnitTestGenerator;
 use Biollante\Generator\Generators\SeederGenerator;
 use Biollante\Generator\Generators\TipsGenerator;
 use Biollante\Generator\Generators\RulesGenerator;
-use Biollante\Generator\Utils\GeneratorFieldsInputUtil;
 use Biollante\Generator\Utils\TableFieldsGenerator;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\VarExporter\VarExporter;
 
 class ScaffoldCommand extends Command
@@ -78,7 +73,7 @@ class ScaffoldCommand extends Command
 			foreach ($eligibleTables as $table) {
 				$model = Str::studly(Str::singular($table));
 				$logFile = "logs/scaffold_{$model}.log";
-				$commands[] = "(nohup sail artisan make:scaffold {$model} > {$logFile} 2>&1 &)";
+				$commands[] = "(nohup php artisan make:scaffold {$model} > {$logFile} 2>&1 &)";
 			}
 	
 			$script = implode(" && \\\n", $commands);
@@ -351,7 +346,7 @@ protected function getDatabaseTables(): array
 	protected function filterEligibleTables(array $tables): array
 	{
 		return array_filter($tables, function ($table) {
-			// Example: Exclude pivot tables and tables handled by packages
+			// Exclude non-plural tables, user-configured exclusions, and framework/package tables
 			return Str::endsWith($table, ['s']) &&
 				!in_array($table, config('biollante.options.excluded_tables', [])) &&
 				!in_array($table, [
@@ -360,14 +355,12 @@ protected function getDatabaseTables(): array
 					'failed_jobs', 
 					'jobs', 
 					'job_batches', 
-					'levy_pass', 
 					'migrations', 
 					'model_has_permissions', 
 					'model_has_roles', 
 					'password_reset_tokens',
 					'permissions',
 					'personal_access_tokens',
-					'promocode_pass',
 					'roles',
 					'role_has_permissions',
 				]);

@@ -6,7 +6,7 @@ namespace {{ $config->namespaces->repository }};
 
 use {{ $config->namespaces->model }}\{{ $config->modelNames->name }};
 use {{ $config->namespaces->app }}\Repositories\BaseRepository;
-use Biollante\Repositories\Extensions\{{ $config->modelNames->name }}RepositoryExtension;
+use {{ $config->namespaces->repository }}\Extensions\{{ $config->modelNames->name }}RepositoryExtension;
 
 class {{ $config->modelNames->name }}Repository extends BaseRepository
 {

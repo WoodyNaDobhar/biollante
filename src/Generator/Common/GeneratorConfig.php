@@ -138,39 +138,21 @@ class GeneratorConfig
 			$viewPrefix .= '/';
 		}
 
-		$paths->repository = config(
-			'laravel_generator.path.repository',
-			app_path('Repositories/')
-		).$namespacePrefix;
+		$paths->repository = config('biollante.path.repository', app_path('Repositories/')).$namespacePrefix;
 
-		$paths->model = config('biollante.path.model', app_path('Models/Core/')).$namespacePrefix;
+		$paths->model = config('biollante.path.model', app_path('Models/')).$namespacePrefix;
 
 		$paths->policy = config('biollante.path.policy', app_path('Policies/')).$namespacePrefix;
 
-		$paths->apiController = config(
-			'laravel_generator.path.api_controller',
-			app_path('Http/Controllers/API/')
-		).$namespacePrefix;
+		$paths->apiController = config('biollante.path.api_controller', app_path('Http/Controllers/API/')).$namespacePrefix;
 
-		$paths->apiResource = config(
-			'laravel_generator.path.api_resource',
-			app_path('Http/Resources/')
-		).$namespacePrefix;
+		$paths->apiResource = config('biollante.path.api_resource', app_path('Http/Resources/')).$namespacePrefix;
 
-		$paths->apiRequest = config(
-			'laravel_generator.path.api_request',
-			app_path('Http/Requests/API/')
-		).$namespacePrefix;
+		$paths->apiRequest = config('biollante.path.api_request', app_path('Http/Requests/API/')).$namespacePrefix;
 
-		$paths->apiRoutes = config(
-			'laravel_generator.path.api_routes',
-			base_path('routes/api.php')
-		);
+		$paths->apiRoutes = config('biollante.path.api_routes', base_path('routes/api.php'));
 
-		$paths->appServiceProvider = config(
-			'laravel_generator.path.app_service_provider',
-			app_path('Providers/AppServiceProvider.php')
-		);
+		$paths->appServiceProvider = config('biollante.path.app_service_provider', app_path('Providers/AppServiceProvider.php'));
 
 		$paths->apiTests = config('biollante.path.api_test', base_path('tests/APIs/'));
 
@@ -179,10 +161,8 @@ class GeneratorConfig
 		$paths->factory = config('biollante.path.factory', database_path('factories/'));
 
 		$paths->seeder = config('biollante.path.seeder', database_path('seeders/test/'));
-		$paths->viewProvider = config(
-			'laravel_generator.path.view_provider',
-			app_path('Providers/ViewServiceProvider.php')
-		);
+
+		$paths->viewProvider = config('biollante.path.view_provider', app_path('Providers/ViewServiceProvider.php'));
 
 		$paths->interfaces = config('biollante.path.interfaces', base_path('resources/@client/interfaces/'));
 
@@ -207,42 +187,24 @@ class GeneratorConfig
 
 		$namespaces->app = app()->getNamespace();
 		$namespaces->app = substr($namespaces->app, 0, strlen($namespaces->app) - 1);
-		$namespaces->repository = config('biollante.namespace.repository', 'Biollante\Repositories').$prefix;
-		$namespaces->model = config('biollante.namespace.model', 'Biollante\Models').$prefix;
-		$namespaces->policy = config('biollante.namespace.policy', 'Biollante\Policies').$prefix;
+		$namespaces->repository = config('biollante.namespace.repository', 'App\Repositories').$prefix;
+		$namespaces->model = config('biollante.namespace.model', 'App\Models').$prefix;
+		$namespaces->policy = config('biollante.namespace.policy', 'App\Policies').$prefix;
 		$namespaces->seeder = config('biollante.namespace.seeder', 'Database\Seeders').$prefix;
 		$namespaces->factory = config('biollante.namespace.factory', 'Database\Factories').$prefix;
-		$namespaces->dataTables = config('biollante.namespace.datatables', 'Biollante\DataTables').$prefix;
-		$namespaces->livewireTables = config('biollante.namespace.livewire_tables', 'Biollante\Http\Livewire');
-		$namespaces->modelExtend = config(
-			'laravel_generator.model_extend_class',
-			'Illuminate\Database\Eloquent\Model'
-		);
+		$namespaces->dataTables = config('biollante.namespace.datatables', 'App\DataTables').$prefix;
+		$namespaces->livewireTables = config('biollante.namespace.livewire_tables', 'App\Http\Livewire');
+		$namespaces->modelExtend = config('biollante.model_extend_class', 'Illuminate\Database\Eloquent\Model');
 
-		$namespaces->apiController = config(
-			'laravel_generator.namespace.api_controller',
-			'Biollante\Http\Controllers\API'
-		).$prefix;
-		$namespaces->apiResource = config(
-			'laravel_generator.namespace.api_resource',
-			'Biollante\Http\Resources'
-		).$prefix;
+		$namespaces->apiController = config('biollante.namespace.api_controller', 'App\Http\Controllers\API').$prefix;
+		$namespaces->apiResource = config('biollante.namespace.api_resource', 'App\Http\Resources').$prefix;
 
-		$namespaces->apiRequest = config(
-			'laravel_generator.namespace.api_request',
-			'Biollante\Http\Requests\API'
-		).$prefix;
+		$namespaces->apiRequest = config('biollante.namespace.api_request', 'App\Http\Requests\API').$prefix;
 
-		$namespaces->request = config(
-			'laravel_generator.namespace.request',
-			'Biollante\Http\Requests'
-		).$prefix;
-		$namespaces->requestBase = config('biollante.namespace.request', 'Biollante\Http\Requests');
-		$namespaces->baseController = config('biollante.namespace.controller', 'Biollante\Http\Controllers');
-		$namespaces->controller = config(
-			'laravel_generator.namespace.controller',
-			'Biollante\Http\Controllers'
-		).$prefix;
+		$namespaces->request = config('biollante.namespace.request', 'App\Http\Requests').$prefix;
+		$namespaces->requestBase = config('biollante.namespace.request', 'App\Http\Requests');
+		$namespaces->baseController = config('biollante.namespace.controller', 'App\Http\Controllers');
+		$namespaces->controller = config('biollante.namespace.controller', 'App\Http\Controllers').$prefix;
 
 		$namespaces->apiTests = config('biollante.namespace.api_test', 'Tests\APIs');
 		$namespaces->permissionTests = config('biollante.namespace.permission_test', 'Tests\Permissions');
@@ -461,9 +423,10 @@ class GeneratorConfig
 		$options->resources = config('biollante.options.resources', false);
 		$options->factory = config('biollante.options.factory', false);
 		$options->seeder = config('biollante.options.seeder', false);
-		$options->databaseSeeder = config('biollante.options.database_seeder', false);
 		$options->swagger = config('biollante.options.swagger', false);
 		$options->tests = config('biollante.options.tests', false);
+		$options->auditable = config('biollante.options.auditable', true);
+		$options->userstamps = config('biollante.options.userstamps', true);
 		$options->excludedFields = config('biollante.options.excluded_fields', ['id']);
 		$options->excludedTables = config('biollante.options.excluded_tables', []);
 

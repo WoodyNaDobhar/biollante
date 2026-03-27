@@ -2,7 +2,7 @@
 	echo '<?php'.PHP_EOL;
 @endphp
 
-namespace Biollante\Repositories\Extensions;
+namespace {{ $config->namespaces->repository }}\Extensions;
 
 trait {{ $config->modelNames->name }}RepositoryExtension
 {

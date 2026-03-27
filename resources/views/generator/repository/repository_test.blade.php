@@ -55,7 +55,7 @@ class {{ $config->modelNames->name }}RepositoryTest extends TestCase
 	public function test_create_{{ $config->modelNames->snake }}()
 	{
 		return $this->runOrExt(__FUNCTION__, function () {
-			$this->actingAs(\Biollante\Models\User::where('id', 1)->first(), 'api');
+			$this->actingAs(\{{ $config->namespaces->model }}\User::where('id', 1)->first(), 'api');
 			${{ $config->modelNames->camel }} = {{ $config->modelNames->name }}::factory()->make()->toArray();
 
 			$created{{ $config->modelNames->name }} = $this->{{ $config->modelNames->camel }}Repo->create(${{ $config->modelNames->camel }});
@@ -73,7 +73,7 @@ class {{ $config->modelNames->name }}RepositoryTest extends TestCase
 	public function test_read_{{ $config->modelNames->snake }}()
 	{
 		return $this->runOrExt(__FUNCTION__, function () {
-			$this->actingAs(\Biollante\Models\User::where('id', 1)->first(), 'api');
+			$this->actingAs(\{{ $config->namespaces->model }}\User::where('id', 1)->first(), 'api');
 			${{ $config->modelNames->camel }} = {{ $config->modelNames->name }}::factory()->create();
 
 			$db{{ $config->modelNames->name }} = $this->{{ $config->modelNames->camel }}Repo->find(${{ $config->modelNames->camel }}->{{ $config->primaryName }});
@@ -88,7 +88,7 @@ class {{ $config->modelNames->name }}RepositoryTest extends TestCase
 	public function test_update_{{ $config->modelNames->snake }}()
 	{
 		return $this->runOrExt(__FUNCTION__, function () {
-			$this->actingAs(\Biollante\Models\User::where('id', 1)->first(), 'api');
+			$this->actingAs(\{{ $config->namespaces->model }}\User::where('id', 1)->first(), 'api');
 			${{ $config->modelNames->camel }} = {{ $config->modelNames->name }}::factory()->create();
 			$updatedNew{{ $config->modelNames->name }} = {{ $config->modelNames->name }}::factory()->make()->toArray();
 
@@ -105,7 +105,7 @@ class {{ $config->modelNames->name }}RepositoryTest extends TestCase
 	public function test_delete_{{ $config->modelNames->snake }}()
 	{
 		return $this->runOrExt(__FUNCTION__, function () {
-			$this->actingAs(\Biollante\Models\User::where('id', 1)->first(), 'api');
+			$this->actingAs(\{{ $config->namespaces->model }}\User::where('id', 1)->first(), 'api');
 			${{ $config->modelNames->camel }} = {{ $config->modelNames->name }}::factory()->create();
 
 			$resp = $this->{{ $config->modelNames->camel }}Repo->delete(${{ $config->modelNames->camel }}->{{ $config->primaryName }});

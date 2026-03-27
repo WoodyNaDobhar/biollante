@@ -70,7 +70,7 @@ class APIControllerGenerator extends BaseGenerator
 		}
 
 		// Load organizer roles from config
-		$organizerRoles = config('biollante.roles.organizer_roles', []);
+		$organizerRoles = config('biollante.organizer_roles', []);
 
 		$variables = [];
 		foreach ($methods as $method) {

@@ -17,7 +17,7 @@ class APIRoutesGenerator extends BaseGenerator
 		$this->config = $config;
 		$this->path = $this->config->paths->apiRoutes;
 		$this->modelName = strtolower($this->config->modelNames->name);
-		$this->controller = "Biollante\Http\Controllers\API\\" . $this->config->modelNames->name . "APIController";
+		$this->controller = $this->config->namespaces->apiController . "\\" . $this->config->modelNames->name . "APIController";
 
 		$this->routes = [
 			'list' => "Route::get('" . $this->config->modelNames->dashedPlural . "', [" . $this->controller . "::class, 'index']);",

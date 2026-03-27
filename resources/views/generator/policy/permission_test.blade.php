@@ -4,9 +4,9 @@
 
 namespace {{ $config->namespaces->permissionTests }};
 
-use Biollante\Models\{{ $modelName }};
+use {{ $config->namespaces->model }}\{{ $modelName }};
 @if($modelName !== 'User')
-use Biollante\Models\User;
+use {{ $config->namespaces->model }}\User;
 @endif
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
@@ -36,7 +36,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 	
 	private static function getOrganizerRoles(): array
 	{
-		return config('biollante.roles.organizer_roles', []);
+		return config('biollante.organizer_roles', []);
 	}
 
 	protected function setUp(): void
@@ -323,24 +323,13 @@ class {{ $modelName }}PermissionsTest extends TestCase
 							}
 	
 							if($roleName !== 'User' && $roleName !== 'Admin'){
-								$position = \Biollante\Models\Position::factory()->create([
-									'name' => 'Organizer',
-									'positionable_type' => ucfirst($baseRole),
-									'positionable_id' => $roleInstance->id,
-								]);
-								$this->createdModels[] = $position;
-								$orgPersona = \Biollante\Models\Persona::factory()->create([
-									'user_id' => $user->id,
-									'is_active'	=> 1
-								]);
-								$this->createdModels[] = $orgPersona;
-								$organizer = \Biollante\Models\Organizer::factory()->create([
-									'persona_id' => $orgPersona->id,
-									'presideable_type' => ucfirst($baseRole),
-									'presideable_id' => $roleInstance->id,
-									'position_id' => $position->id,
-								]);
-								$this->createdModels[] = $organizer;
+								$scopeResolver = app(\Biollante\Contracts\ScopeResolver::class);
+								if ($scopeResolver) {
+									$scopeModels = $scopeResolver->grantScopeForTest($user, ucfirst($baseRole), $roleInstance->id);
+									foreach ($scopeModels as $scopeModel) {
+										$this->createdModels[] = $scopeModel;
+									}
+								}
 								$user->refresh();
 							}
 	
@@ -405,24 +394,13 @@ class {{ $modelName }}PermissionsTest extends TestCase
 									$previousPart = $part;
 
 									if($roleName !== 'User'){
-										$position = \Biollante\Models\Position::factory()->create([
-											'name' => 'Organizer',
-											'positionable_type' => ucfirst($baseRole),
-											'positionable_id' => $previousInstance->id,
-										]);
-										$this->createdModels[] = $position;
-										$orgPersona = \Biollante\Models\Persona::factory()->create([
-											'user_id' => $user->id,
-											'is_active'	=> 1
-										]);
-										$this->createdModels[] = $orgPersona;
-										$organizer = \Biollante\Models\Organizer::factory()->create([
-											'persona_id' => $orgPersona->id,
-											'presideable_type' => ucfirst($baseRole),
-											'presideable_id' => $previousInstance->id,
-											'position_id' => $position->id,
-										]);
-										$this->createdModels[] = $organizer;
+										$scopeResolver = app(\Biollante\Contracts\ScopeResolver::class);
+										if ($scopeResolver) {
+											$scopeModels = $scopeResolver->grantScopeForTest($user, ucfirst($baseRole), $previousInstance->id);
+											foreach ($scopeModels as $scopeModel) {
+												$this->createdModels[] = $scopeModel;
+											}
+										}
 										$user->refresh();
 									}
 								}else{
@@ -443,10 +421,10 @@ class {{ $modelName }}PermissionsTest extends TestCase
 	
 						if(str_contains($previousPart, '_id')){
 							$payload[$previousPart] = $previousInstance->id;
-						}elseif(class_exists("Biollante\\Models\\" . ucfirst(Str::singular($previousPart)))){
+						}elseif(class_exists("{{ str_replace('\\', '\\\\', $config->namespaces->model) }}\\" . ucfirst(Str::singular($previousPart)))){
 							$payload[$previousPart . '_id'] = $previousInstance->id;
 						}else{
-							$payload[$previousPart . '_type'] = str_replace('Biollante\\Models\\', '', $previousInstance::class);
+							$payload[$previousPart . '_type'] = class_basename($previousInstance);
 							$payload[$previousPart . '_id'] = $previousInstance->id;
 						}
 	
@@ -545,7 +523,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 	{
 		$tableName = null;
 		$fieldName = null;
-		$modelClass = "\\Biollante\\Models\\" . ucfirst(Str::singular($modelType));
+		$modelClass = "\\{{ str_replace('\\', '\\\\', $config->namespaces->model) }}\\" . ucfirst(Str::singular($modelType));
 		$model_id = array_key_exists(Str::snake(lcfirst(static::getModelName())) . '_id', $attributes) ? $attributes[Str::snake(lcfirst(static::getModelName())) . '_id'] : null;
 		$pivotAttributes = null;
 		$pivotTable = null;
@@ -554,7 +532,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 			$segments = explode('_', Str::snake($modelType));
 			$tableName = Str::plural(array_shift($segments));
 			$modelType = !$isPlural ? Str::singular($tableName) : $tableName;
-			$modelClass = "\\Biollante\\Models\\" . Str::singular(ucfirst($tableName));
+			$modelClass = "\\{{ str_replace('\\', '\\\\', $config->namespaces->model) }}\\" . Str::singular(ucfirst($tableName));
 			$fieldName = array_shift($segments) ?? '';
 			if (!class_exists($modelClass)) {
 				dd('CHECKME');
@@ -628,7 +606,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 
 	private function determineRelatedType(string $part, ?object $previousModel, ?string $parent, ?string $child)
 	{
-		if (class_exists("\\Biollante\\Models\\" . ucfirst(Str::singular($part)))) {
+		if (class_exists("\\{{ str_replace('\\', '\\\\', $config->namespaces->model) }}\\" . ucfirst(Str::singular($part)))) {
 			return ucfirst(Str::singular($part));
 		} else
 		if ($this->isPlural(($part))) {
@@ -645,7 +623,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 			}
 			dd('CHECKME');
 		} else
-		if(class_exists("\\Biollante\\Models\\" . ucfirst($parent))) {
+		if(class_exists("\\{{ str_replace('\\', '\\\\', $config->namespaces->model) }}\\" . ucfirst($parent))) {
 			$parentEnumOptions = $this->getEnumValues(Str::plural($parent), $part . '_type');
 			foreach($parentEnumOptions as $parentEnumOption){
 				if($parentEnumOption === ucfirst($child)){

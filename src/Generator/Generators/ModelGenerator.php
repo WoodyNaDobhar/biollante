@@ -200,10 +200,11 @@ class ModelGenerator extends BaseGenerator
 	public function updateAppServiceProvider()
 	{
 		$appServiceProviderPath = $this->config->paths->appServiceProvider;
+		$modelNs = str_replace('\\', '\\\\', $this->config->namespaces->model);
 
 		$modelBind = 
-			"			'" . $this->config->modelNames->name . "' => 'Biollante\\Models\\" . $this->config->modelNames->name . "'," . BiollanteHelper::instance()->format_nl() .
-			"			'Core" . $this->config->modelNames->name . "' => 'Biollante\\Models\\Core\\" . $this->config->modelNames->name . "'," . BiollanteHelper::instance()->format_nl();
+			"			'" . $this->config->modelNames->name . "' => '" . $modelNs . "\\" . $this->config->modelNames->name . "'," . BiollanteHelper::instance()->format_nl() .
+			"			'Core" . $this->config->modelNames->name . "' => '" . $modelNs . "\\Core\\" . $this->config->modelNames->name . "'," . BiollanteHelper::instance()->format_nl();
 
 		// Check if the file exists
 		if (!file_exists($appServiceProviderPath)) {
@@ -214,7 +215,7 @@ class ModelGenerator extends BaseGenerator
 		$contents = file_get_contents($appServiceProviderPath);
 
 		// Check if the mapping already exists
-		if (strpos($contents, "'" . $this->config->modelNames->name . "' => 'Biollante\\Models\\" . $this->config->modelNames->name . "'") !== false) {
+		if (strpos($contents, "'" . $this->config->modelNames->name . "' => '" . $modelNs . "\\" . $this->config->modelNames->name . "'") !== false) {
 			// If already exists, return without making changes
 			return;
 		}
@@ -227,6 +228,7 @@ class ModelGenerator extends BaseGenerator
 		$foundStart = false;
 		$foundStop = false;
 		$newContents = '';
+		$modelNsPattern = preg_quote($modelNs, '/');
 
 		foreach ($lines as $line) {
 
@@ -246,7 +248,7 @@ class ModelGenerator extends BaseGenerator
 				!$foundStop &&
 				!$inserted &&
 				trim($line) !== '' &&
-				preg_match("/'([^']+)' => 'Biollante\\\\Models\\\\[^']+'/", $line, $lineMatch) &&
+				preg_match("/'([^']+)' => '" . $modelNsPattern . "\\\\[^']+'/", $line, $lineMatch) &&
 				!Str::startsWith($lineMatch[1], 'Core') && // only compare against non-Core lines
 				strcmp($newModelKey, $lineMatch[1]) < 0
 			) {
@@ -751,7 +753,7 @@ class ModelGenerator extends BaseGenerator
 			}
 
 			// Build full model class path to check its fields
-			$relatedModelClass = "Biollante\\Models\\{$relatedModel}";
+			$relatedModelClass = $this->config->namespaces->model . "\\{$relatedModel}";
 			if (!class_exists($relatedModelClass)) {
 				continue;
 			}

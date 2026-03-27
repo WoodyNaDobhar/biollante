@@ -7,55 +7,47 @@ namespace {{ $config->namespaces->model }}\Core;
 use Illuminate\Database\Eloquent\Model;
 @if($config->options->softDelete)
 use Illuminate\Database\Eloquent\SoftDeletes;
+@if($config->options->userstamps)
 use Wildside\Userstamps\Userstamps;
+@endif
 @endif
 @if($config->options->tests || $config->options->factory)
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 @endif
-use Biollante\Traits\CustomAuditable;
+@if($config->options->auditable)
+use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+@endif
 @if($config->modelNames->name === "User")
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use LaravelAndVueJS\Traits\LaravelPermissionToVueJS;
-use Laravel\Cashier\Billable;
-@endif
-@if($config->modelNames->name === "Subscription")
-use Laravel\Cashier\Subscription as CashierSubscription;
-@endif
-@if($config->modelNames->name === "SubscriptionItem")
-use Laravel\Cashier\SubscriptionItem as CashierSubscriptionItem;
 @endif
 
 @if($config->modelNames->name === "User")
-class {{ $config->modelNames->name }} extends Authenticatable implements AuditableContract, MustVerifyEmail
-@elseif($config->modelNames->name === "Subscription")
-class {{ $config->modelNames->name }} extends CashierSubscription implements AuditableContract
-@elseif($config->modelNames->name === "SubscriptionItem")
-class {{ $config->modelNames->name }} extends CashierSubscriptionItem implements AuditableContract
+class {{ $config->modelNames->name }} extends Authenticatable @if($config->options->auditable)implements AuditableContract @endif
+
 @else
-class {{ $config->modelNames->name }} extends BaseModel implements AuditableContract
+class {{ $config->modelNames->name }} extends {{ class_basename($config->namespaces->modelExtend) }} @if($config->options->auditable)implements AuditableContract @endif
+
 @endif
 {
 
 @if($config->modelNames->name === "User")
 	use HasRoles;
 	use HasApiTokens;
-	use HasProfilePhoto;
 	use Notifiable;
-	use TwoFactorAuthenticatable;
-	use LaravelPermissionToVueJS;
-	use Billable;
 @endif
-	use CustomAuditable;
+@if($config->options->auditable)
+	use AuditableTrait;
+@endif
 @if($config->options->softDelete)
 {{ Biollante\Helpers\BiollanteHelper::format_tab().'use SoftDeletes;' }}
+@if($config->options->userstamps)
 {{ Biollante\Helpers\BiollanteHelper::format_tab().'use Userstamps;' }}
+@endif
 @endif
 @if($config->options->tests or $config->options->factory)
 {{ Biollante\Helpers\BiollanteHelper::format_tab().'use HasFactory;' }}

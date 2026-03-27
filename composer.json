@@ -10,7 +10,15 @@
 	},
 	"require": {
 		"php": "^8.2",
-		"illuminate/support": "^10|^11"
+		"illuminate/support": "^10|^11",
+		"spatie/laravel-permission": "^5.0|^6.0",
+		"spatie/async": "^1.0",
+		"symfony/var-exporter": "^6.0|^7.0"
+	},
+	"suggest": {
+		"owen-it/laravel-auditing": "Required if using the default model template with audit support",
+		"wildside/userstamps": "Required if using the default model template with userstamp support",
+		"darkaonline/l5-swagger": "For automatic Swagger documentation regeneration after scaffolding"
 	},
 	"extra": {
 		"laravel": {
