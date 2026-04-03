@@ -12,6 +12,9 @@ use Biollante\Generator\Events\GeneratorFileCreating;
 use Biollante\Generator\Events\GeneratorFileDeleted;
 use Biollante\Generator\Events\GeneratorFileDeleting;
 use Biollante\Generator\Generators\API\APIControllerGenerator;
+use Biollante\Generator\Generators\API\AppBaseControllerGenerator;
+use Biollante\Generator\Generators\API\BaseAPIControllerGenerator;
+use Biollante\Generator\Generators\API\BaseAPIRoutesGenerator;
 use Biollante\Generator\Generators\API\APIRequestGenerator;
 use Biollante\Generator\Generators\API\APIResourceGenerator;
 use Biollante\Generator\Generators\API\APIRoutesGenerator;
@@ -222,6 +225,22 @@ class ScaffoldCommand extends Command
 
 	public function performWrapupActions()
 	{
+		// Generate base controllers and routes (once, not per-model)
+		$this->info('Generating AppBaseController');
+		$appBaseControllerGenerator = new AppBaseControllerGenerator();
+		$appBaseControllerGenerator->generate();
+		$this->comment('AppBaseController generated successfully.');
+
+		$this->info('Generating BaseAPIController');
+		$baseAPIControllerGenerator = new BaseAPIControllerGenerator();
+		$baseAPIControllerGenerator->generate();
+		$this->comment('BaseAPIController generated successfully.');
+
+		$this->info('Generating base API routes');
+		$baseAPIRoutesGenerator = new BaseAPIRoutesGenerator();
+		$baseAPIRoutesGenerator->generate();
+		$this->comment('Base API routes generated successfully.');
+
 		$this->info('Generating Swagger documentation');
 		try {
 			\Artisan::call('l5-swagger:generate');

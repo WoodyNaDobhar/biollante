@@ -1,28 +1,14 @@
 # Biollante
 
-A database-driven scaffolding generator for Laravel API backends. Biollante reads your MySQL schema and generates a complete API stack: models, policies, controllers, resources, routes, tests, TypeScript interfaces, validation rules, and Swagger documentation.
+A database-driven scaffolding generator for Laravel. Biollante reads your MySQL schema and generates a complete application stack: models, policies, API controllers, resources, routes, tests, TypeScript interfaces, validation rules, and Swagger documentation.
 
 > **Beta.** Biollante is under active development. It works and is used in production, but the API is not yet stable and the documentation is catching up with the code. Contributions and feedback are welcome, but expect rough edges.
 
-## Philosophy
-
-Biollante generates **API backends**, not full-stack applications. It assumes your frontend is a separate concern — a Vue/React/Svelte SPA, a mobile app, or any other client that consumes a JSON API. There are no Blade views, no web controllers, no server-rendered HTML.
-
-This is a deliberate architectural choice. The generated stack is:
-
-- **API controllers** that return JSON via Laravel resources
-- **Sanctum-authenticated routes** sorted into public and protected groups
-- **Swagger/OpenAPI documentation** generated from the schema
-- **TypeScript interfaces and validation rules** for your frontend client
-- **Policies** with granular Full/Own/Related permission checks
-
-Everything is derived from the database: column types, nullability, foreign keys, enums, polymorphic patterns, comments, and constraints. The schema is the source of truth.
-
-## What It Generates
+## What It Does
 
 Point Biollante at a database table (or all of them) and it generates:
 
-**Backend (PHP/Laravel)**
+**Backend**
 - Models with a wrapper/core/extension architecture
 - Policies with owner, related, and scoped permission checks
 - API controllers (with optional repository pattern)
@@ -32,18 +18,29 @@ Point Biollante at a database table (or all of them) and it generates:
 - Swagger/OpenAPI documentation annotations
 - Factories, seeders, and test scaffolding (API, permission, repository, and unit)
 
-**Frontend (TypeScript)**
+**Frontend**
 - TypeScript interfaces (full, simple, and super-simple variants)
 - Vuelidate validation rules with extension points
 - Field-level tooltip definitions
-- Enum constant files
+
+Everything is derived from the database: column types, nullability, foreign keys, enums, polymorphic patterns, comments, and constraints. The schema is the source of truth.
 
 ## Requirements
 
-- PHP 8.2+
-- Laravel 10+
+- PHP 8.3+
+- Laravel 12+
 - MySQL or MariaDB (Biollante queries `information_schema` directly)
-- [Spatie Laravel Permission](https://github.com/spatie/laravel-permission) (for policy and permission test generation)
+- [Spatie Laravel Permission](https://github.com/spatie/laravel-permission) `^5|^6|^7`
+- [Genealabs Laravel Pivot Events](https://github.com/genealabs/laravel-pivot-events)
+
+### Suggested packages
+
+The following packages are not required, but Biollante's generated output is aware of them and will produce richer scaffolding when they are present:
+
+- `owen-it/laravel-auditing` — enables audit trail support in generated models
+- `wildside/userstamps` — enables `created_by` / `updated_by` tracking in generated models
+- `darkaonline/l5-swagger` — triggers automatic Swagger documentation regeneration after scaffolding
+- `barryvdh/laravel-ide-helper` — triggers IDE helper regeneration after scaffolding
 
 ## Installation
 
@@ -51,13 +48,69 @@ Point Biollante at a database table (or all of them) and it generates:
 composer require woodynadobhar/biollante
 ```
 
-Laravel auto-discovers the service provider. Then publish the config:
+Laravel auto-discovers the service provider. Then publish assets using the tags below.
+
+### Publish tags
+
+| Tag | Command | What it publishes |
+|---|---|---|
+| `biollante` | `php artisan vendor:publish --tag=biollante` | `config/biollante.php` |
+| `biollante-views` | `php artisan vendor:publish --tag=biollante-views` | Blade generation templates to `resources/views/vendor/biollante/` |
+| `biollante-inertia` | `php artisan vendor:publish --tag=biollante-inertia --force` | `HandleInertiaRequests` middleware stub with permission sharing pre-wired |
+| `biollante-frontend` | `php artisan vendor:publish --tag=biollante-frontend` | `usePermissions.ts` Vue composable |
+
+The `--force` flag is required for `biollante-inertia` because `HandleInertiaRequests` already exists in any Jetstream/Inertia application and would otherwise be skipped.
+
+A typical first install:
 
 ```bash
 php artisan vendor:publish --tag=biollante
+php artisan vendor:publish --tag=biollante-inertia --force
+php artisan vendor:publish --tag=biollante-frontend
 ```
 
-This publishes `config/biollante.php`, which contains all package configuration: output paths, namespaces, generation options, and scoped access settings.
+Publish `biollante-views` only if you intend to customise generated output templates.
+
+## Permissions in the Frontend
+
+Roles and permissions are available to your Vue frontend out of the box.
+
+### Backend trait
+
+The generated User model includes the HasJsPermissions trait, which serialises the user's Spatie roles and permissions into a JSON structure suitable for frontend consumption.
+
+### Inertia middleware
+
+Publishing `biollante-inertia` writes a `HandleInertiaRequests` stub to `app/Http/Middleware/` that shares permissions on every request:
+
+```php
+public function share(Request $request): array
+{
+    return array_merge(parent::share($request), [
+        'auth' => [
+            'user'          => $request->user(),
+            'jsPermissions' => $request->user()?->jsPermissions(),
+        ],
+    ]);
+}
+```
+
+### Frontend composable
+
+Publishing `biollante-frontend` writes `usePermissions.ts` to your frontend resources. It reads from Inertia's shared props and exposes `can()` and `is()` helpers:
+
+```ts
+import { usePermissions } from '@/composables/usePermissions'
+
+const { can, is } = usePermissions()
+
+if (can('edit posts')) { ... }
+if (is('Admin')) { ... }
+```
+
+### Sanctum token flows
+
+For API-authenticated contexts where Inertia is not in the picture, call `$user->jsPermissions()` directly and include it in your login response payload. The frontend stores and re-applies it from `localStorage` as needed.
 
 ## Usage
 
@@ -124,13 +177,39 @@ Feature toggles that control what gets generated:
 
 ### Scoped Access
 
-Three keys control the permission architecture:
+Three keys control the permission architecture for applications that have entity-scoped roles (e.g. an organizer who has authority over a specific entity but not the whole system):
 
-**`organizer_roles`** — base names of entity types that have scoped organizer authority (e.g. `['Practice']` or `['Chapter', 'Collective', 'World']`). These drive permission path resolution and Swagger documentation. Set to `[]` if your app has no scoped roles.
+**`organizer_roles`** — base names of entity types that carry organizer-level authority (e.g. `['Practice']` or `['Chapter', 'Collective', 'World']`). Biollante appends `" Organizer"` when resolving role names, so `'Practice'` becomes `'Practice Organizer'`. These values drive permission path resolution and Swagger documentation. Set to `[]` if your app has no scoped roles.
 
-**`scope_resolver`** — fully qualified class name implementing `Biollante\Contracts\ScopeResolver`. This tells Biollante how your application links users to scoped entities at runtime. Set to `null` if your app doesn't use scoped access.
+**`scope_resolver`** — fully qualified class name implementing `Biollante\Contracts\ScopeResolver`. This tells Biollante how your application proves at runtime that a user holds a scoped role over a particular entity. The interface requires two methods:
 
-**`parent_hierarchy`** — maps child entity types to their parents for cascading permission checks (e.g. authority over a Collective grants access to its Chapters). Set to `[]` if your app has no hierarchical entity relationships.
+```php
+interface ScopeResolver
+{
+    public function userHasScope(User $user, string $roleType, Model $entity): bool;
+    public function grantScopeForTest(User $user, string $roleType, Model $entity): void;
+}
+```
+
+Set to `null` if your app does not use scoped access. Biollante will generate policies with only Full and Own permission checks.
+
+**`parent_hierarchy`** — maps child entity types to their parent entity type and the foreign key connecting them. Used in generated policies to cascade organizer authority from a parent to its children.
+
+```php
+'parent_hierarchy' => [
+    'Chapter' => ['parent_type' => 'Collective', 'parent_field' => 'collective_id'],
+],
+```
+
+Set to `[]` if your application has no hierarchical entity relationships affecting permission scoping.
+
+### Invitations
+
+```php
+'invitations' => true,
+```
+
+When enabled, Biollante generates invitation token generation and decoding endpoints in `AppBaseController`. Set to `false` if your application does not use an invitation flow.
 
 ## Schema Conventions
 
@@ -169,62 +248,46 @@ Nullability is treated as a business rule, not just a database concern. Non-null
 
 Biollante uses database column and table comments as documentation source material for Swagger descriptions, TypeScript tooltips, and field hints. Without comments, generated documentation is generic.
 
-### Polymorphic Relations
-
-The `_type` column must be a MySQL ENUM. Values must be singular StudlyCase model names matching your application's model classes (e.g. `'User'`, `'Guide'`, `'Practice'`).
-
-If a column comment contains `morphOne`, a singular relation is generated. Otherwise it defaults to `morphMany`.
-
-### Pivot Tables
-
-Many-to-many relationships are inferred when a table contains exactly two foreign keys pointing at different tables. Standard Laravel pivot naming conventions apply.
-
-### Enums
-
-Native MySQL ENUMs generate typed constants in TypeScript. For polymorphic `_type` columns, enum values must align with model naming. For regular enums, Biollante generates a TypeScript constants file.
-
-## Scoped Access
-
-Biollante generates policies that support three levels of access for each action (display, update, remove):
-
-- **Full** — the user has the unrestricted permission (e.g. `display events`)
-- **Own** — the user owns the resource (traced through `user_id` or polymorphic owner paths)
-- **Related** — the user has scoped authority over the entity the resource belongs to
-
-The first two are handled generically. The third requires your application to implement `Biollante\Contracts\ScopeResolver`, which answers the question: "does this user have authority over entity X?" Different apps answer this differently — some use polymorphic organizer chains, others use direct pivot tables. The interface abstracts the mechanism.
-
-See `src/Contracts/ScopeResolver.php` for the full interface documentation.
-
-## Model Architecture
-
-Generated models use a three-layer pattern:
-
-```
-app/Models/Event.php              ← Wrapper (uses the Extension trait)
-app/Models/Core/Event.php         ← Core (generated, overwritten on re-scaffold)
-app/Models/Extensions/EventExtension.php  ← Extension (generated once, never overwritten)
-```
-
-Custom relationships, accessors, mutators, and business logic go in the Extension. The Core model is regenerated freely. The Wrapper ties them together.
-
-## Template Customization
-
-Biollante uses Blade templates for all code generation. To customize output:
-
-```bash
-php artisan vendor:publish --tag=biollante-views
-```
-
-This publishes templates to `resources/views/vendor/biollante/`. Modifications take precedence over the package defaults.
-
 ## Post-Generation
 
 After scaffolding, Biollante automatically:
 
 - Clears and rebuilds the config, route, and view caches
 - Dumps the optimized autoloader
-- Regenerates Swagger documentation (if `l5-swagger` is installed)
+- Regenerates Swagger documentation (if `darkaonline/l5-swagger` is installed)
 - Regenerates IDE helper files (if `barryvdh/laravel-ide-helper` is installed)
+
+## Template Customization
+
+Biollante uses Blade templates for all code generation. To customise generated output:
+
+```bash
+php artisan vendor:publish --tag=biollante-views
+```
+
+This publishes templates to `resources/views/vendor/biollante/`. Modifications take precedence over the package defaults. Only publish this tag if you need custom output — most applications should not need it.
+
+## Generated Architecture
+
+### Models
+
+Each model is split into three files:
+
+- **Core** (`EventCore.php`) — generated freely, contains schema-derived casts, fillable, relations, and validation rules. Never edit this file directly.
+- **Wrapper** (`Event.php`) — generated once, then yours. Extends Core. The place for custom accessors, mutators, and business logic.
+- **Extension** (`EventExtension.php`) — generated once, then yours. Blade-style extension point for appended attributes and retrieved-event customizations.
+
+The Core model is regenerated freely. The Wrapper ties them together.
+
+### Permissions
+
+Generated policies distinguish three levels of access per operation:
+
+- **Full** — the user has unconditional permission (e.g. Admin, or no role holds the permission at all)
+- **Own** — the user has permission only over records they own (linked via a `user_id` or equivalent path)
+- **Related** — the user has permission over records belonging to an entity they hold a scoped role over
+
+Permission path resolution is driven entirely by the database schema and `organizer_roles` config. Biollante walks foreign key chains to determine how a user's role connects to any given resource.
 
 ## Contributing
 

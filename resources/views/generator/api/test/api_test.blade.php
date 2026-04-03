@@ -6,7 +6,7 @@ namespace {{ $config->namespaces->apiTests }};
 
 use Illuminate\Support\Str;
 use {{ $config->namespaces->tests }}\TestCase;
-use {{ $config->namespaces->tests }}\ApiTestTrait;
+use Biollante\Testing\ApiTestTrait;
 @if($config->modelNames->name !== 'User')
 use {{ $config->namespaces->model }}\{{ $config->modelNames->name }};
 @endif

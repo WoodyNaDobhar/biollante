@@ -114,7 +114,7 @@ return [
 	|
 	*/
 
-	'model_extend_class' => 'Illuminate\Database\Eloquent\Model',
+	'model_extend_class' => 'Biollante\Models\BaseModel',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -278,5 +278,192 @@ return [
 	*/
 
 	'parent_hierarchy' => [],
+
+		/*
+	|--------------------------------------------------------------------------
+	| API Info
+	|--------------------------------------------------------------------------
+	|
+	| Metadata for the generated Swagger @OA\OpenApi block. These values
+	| populate the API title, description, contact info, and server URL
+	| in the generated AppBaseController.
+	|
+	*/
+
+	'api' => [
+		'title'       => 'API',
+		'version'     => '1.0.0',
+		'description' => '',
+		'terms_url'   => null,
+		'contact'     => [
+			'name'  => null,
+			'email' => null,
+		],
+		'server_url'  => '/api',
+	],
+
+	/*
+	|--------------------------------------------------------------------------
+	| Registration Fields
+	|--------------------------------------------------------------------------
+	|
+	| Controls the compound registration lifecycle. The universal auth
+	| fields (email, password, password_confirm, device_name, is_agreed)
+	| are always included — only list additional fields here.
+	|
+	| Field metadata (type, description, max length) is derived from the
+	| database schema at generation time — only the field name and
+	| whether it's required need to be specified.
+	|
+	*/
+
+	'register_fields' => [
+
+		/*
+		| Additional fields on the users table included in registration.
+		*/
+		'user' => [
+			// 'first_name'  => ['required' => true],
+			// 'last_name'   => ['required' => true],
+			// 'born_on'     => ['required' => true],
+			// 'timezone'    => ['required' => true],
+		],
+
+		/*
+		| Forced defaults applied to the User on creation.
+		| These are not submitted by the user.
+		*/
+		'user_defaults' => [
+			// 'is_active' => 1,
+		],
+
+		/*
+		| Related models created alongside the User during registration.
+		| Key is the model name, value is an array of field => required.
+		*/
+		'related' => [
+			// 'Persona' => [
+			//     'name'         => ['required' => true],
+			//     'display_name' => ['required' => true],
+			//     'world_id'     => ['required' => false],
+			//     'chapter_id'   => ['required' => false],
+			//     'pronoun_id'   => ['required' => false],
+			// ],
+		],
+
+		/*
+		| Agreements/waivers created during registration.
+		|
+		| context_model: The model with is_waiver_* boolean flags (e.g. World)
+		| context_field: Registration input field identifying the context instance
+		| agreement_model: The model that stores signed waivers
+		| waiver_types: Types to check — maps to is_waiver_{type} on context
+		|               and {type}_signed on the registration input
+		|
+		| supporting_models: Models created from input whose FK goes on the
+		|                    Agreement. Key is model name.
+		|   fields: input fields used to create this model
+		|   fk_field: foreign key field name stored on the Agreement
+		|
+		| data_fields: Fields stored directly on Agreement from input
+		| computed_fields: Fields composed from other input values
+		|
+		| Set to null to disable agreement processing.
+		*/
+		'agreements' => null,
+		// Example for ELF:
+		// 'agreements' => [
+		//     'context_model'   => 'World',
+		//     'context_field'   => 'world_id',
+		//     'agreement_model' => 'Agreement',
+		//     'waiver_types'    => ['Harmless', 'Media', 'Site'],
+		//     'supporting_models' => [
+		//         'Location' => [
+		//             'fields'   => ['address', 'city', 'province', 'postal_code', 'country'],
+		//             'fk_field' => 'location_id',
+		//         ],
+		//     ],
+		//     'data_fields' => [
+		//         'emergency_name', 'emergency_relationship', 'emergency_phone',
+		//         'medical', 'guardian', 'phone',
+		//     ],
+		//     'computed_fields' => [
+		//         'name'       => "first_name + ' ' + last_name",
+		//         'email'      => 'email',
+		//         'born_on'    => 'born_on',
+		//         'pronoun_id' => 'pronoun_id',
+		//     ],
+		// ],
+
+		/*
+		| Role assigned to newly registered users.
+		*/
+		'default_role' => 'User',
+
+		/*
+		| Eager loads returned with the login response.
+		*/
+		'login_with' => [],
+	],
+
+	/*
+	|--------------------------------------------------------------------------
+	| Invitations
+	|--------------------------------------------------------------------------
+	|
+	| When enabled, generates invite-related endpoints: generateInvite,
+	| decodeInvite, sendInvite, and accept. The invitation system uses
+	| encrypted tokens with optional expiry and usage limits.
+	|
+	*/
+
+	'invitations' => [
+		'enabled'     => false,
+		'token_field' => 'invite_token',
+	],
+
+	/*
+	|--------------------------------------------------------------------------
+	| Global Search
+	|--------------------------------------------------------------------------
+	|
+	| When enabled, generates a /search endpoint that fans out across
+	| the configured models using Laravel Scout. Each model listed here
+	| gets the Searchable trait added by the model generator.
+	|
+	| Per-model 'with' controls eager loads on search results.
+	|
+	*/
+
+	'search' => [
+		'enabled' => false,
+		'models'  => [
+			// 'Achievement' => ['with' => []],
+			// 'Chapter'     => ['with' => ['collective', 'world']],
+			// 'Persona'     => ['with' => ['chapter.world']],
+		],
+	],
+
+	/*
+	|--------------------------------------------------------------------------
+	| Account Deletion
+	|--------------------------------------------------------------------------
+	|
+	| When enabled, generates a /delete endpoint that anonymizes user
+	| data rather than hard-deleting. The 'anonymize' array maps field
+	| names to their replacement values. Use {id} as a placeholder
+	| for the user's ID.
+	|
+	*/
+
+	'delete_account' => [
+		'enabled'   => true,
+		'anonymize' => [
+			// 'first_name'  => 'Deleted',
+			// 'last_name'   => 'User',
+			// 'email'       => 'deleted_user_{id}@nowhere.net',
+			// 'is_active'   => false,
+		],
+	],
 
 ];

@@ -5,7 +5,7 @@
 namespace {{ $config->namespaces->apiRequest }};
 
 use {{ $config->namespaces->model }}\{{ $config->modelNames->name }};
-use {{ $config->namespaces->apiRequest }}\APIRequest;
+use Biollante\Http\Requests\API\APIRequest;
 
 class Update{{ $config->modelNames->name }}APIRequest extends APIRequest
 {

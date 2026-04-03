@@ -39,6 +39,14 @@ class BiollanteServiceProvider extends ServiceProvider
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/biollante'),
 			], 'biollante-views');
 
+			$this->publishes([
+				__DIR__ . '/../stubs/HandleInertiaRequests.php' => app_path('Http/Middleware/HandleInertiaRequests.php'),
+			], 'biollante-inertia');
+
+			$this->publishes([
+				__DIR__ . '/../stubs/frontend/usePermissions.ts' => resource_path('js/composables/usePermissions.ts'),
+			], 'biollante-frontend');
+
 			$this->commands([
 				ScaffoldCommand::class,
 			]);

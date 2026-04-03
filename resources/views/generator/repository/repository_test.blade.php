@@ -8,7 +8,7 @@ use {{ $config->namespaces->model }}\{{ $config->modelNames->name }};
 use {{ $config->namespaces->repository }}\{{ $config->modelNames->name }}Repository;
 use PHPUnit\Framework\Attributes\Test;
 use {{ $config->namespaces->tests }}\TestCase;
-use {{ $config->namespaces->tests }}\ApiTestTrait;
+use Biollante\Testing\ApiTestTrait;
 
 class {{ $config->modelNames->name }}RepositoryTest extends TestCase
 {

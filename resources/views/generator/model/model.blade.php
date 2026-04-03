@@ -24,6 +24,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use HasJsPermissions;
 @endif
 
 @if($config->modelNames->name === "User")
@@ -39,6 +40,7 @@ class {{ $config->modelNames->name }} extends {{ class_basename($config->namespa
 	use HasRoles;
 	use HasApiTokens;
 	use Notifiable;
+	use HasJsPermissions;
 @endif
 @if($config->options->auditable)
 	use AuditableTrait;
