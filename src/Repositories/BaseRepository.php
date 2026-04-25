@@ -316,13 +316,13 @@ abstract class BaseRepository
 	 * Find model record for given other unique column value.
 	 *
 	 * @param  string  $column
-	 * @param  mixed  $value
+	 * @param  int  $id
 	 * @param array $columns
 	 * @param array $with
 	 *
 	 * @return Builder|Builder[]|Collection|Model|null
 	 */
-	public function firstWhere($column, $value, $columns = ['*'], $with = null)
+	public function firstWhere($column, $id, $columns = ['*'], $with = null)
 	{
 		$query = $this->model->newQuery();
 		
@@ -335,7 +335,7 @@ abstract class BaseRepository
 				$query->with($with);
 			}
 		}
-		return $query->where($column, $value)->first($columns);
+		return $query->where($column, $id)->first($columns);
 	}
 	
 	/**
@@ -348,9 +348,7 @@ abstract class BaseRepository
 	 */
 	public function update($input, $id)
 	{
-		$query = $this->model->newQuery();
-		
-		$model = $query->findOrFail($id);
+		$model = $this->findOrFail($id);
 		
 		$model->fill($input);
 		
@@ -368,9 +366,7 @@ abstract class BaseRepository
 	 */
 	public function delete($id)
 	{
-		$query = $this->model->newQuery();
-		
-		$model = $query->findOrFail($id);
+		$model = $this->findOrFail($id);
 		
 		return $this->relatedDelete($this->model, $model);
 	}
@@ -405,7 +401,7 @@ abstract class BaseRepository
 	{
 		return $this->find($id, $columns);
 	}
-
+	
 	/**
 	 * Resolve the fully qualified model class name for a related model.
 	 *
@@ -417,7 +413,7 @@ abstract class BaseRepository
 		$namespace = config('biollante.namespace.model', 'App\\Models');
 		return $namespace . '\\' . $modelName;
 	}
-	
+		
 	protected function relatedSave($model, $input, $parent)
 	{
 		//if any exist

@@ -284,7 +284,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 									$this->isPolyFieldOption(Str::snake(Str::plural(lcfirst(static::getModelName()))), null, $baseRole)
 								)
 							){
-                                $roleInstance = $baseRole !== 'user' ? $this->createRelatedInstance($baseRole) : $user;
+								$roleInstance = $baseRole !== 'user' ? $this->createRelatedInstance($baseRole) : $user;
 								if($baseRole !== 'user'){
 									$this->createdModels[] = $roleInstance;
 								}
@@ -684,7 +684,7 @@ class {{ $modelName }}PermissionsTest extends TestCase
 			})->exists();
 
 			if (!$rolesWithPermission) {
-                $response->assertStatus(200, "Visitor should have permission to perform {$action} because no role explicitly has this permission.");
+				$response->assertStatus(200, "Visitor should have permission to perform {$action} because no role explicitly has this permission.");
 			} else {
 				$validStatuses = [401, 403];
 				$this->assertTrue(

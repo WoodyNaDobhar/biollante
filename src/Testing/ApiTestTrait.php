@@ -33,15 +33,21 @@ trait ApiTestTrait
 				continue;
 			}
 	
-			if (in_array($key, ['created_at', 'updated_at', 'deleted_at'])) {
-				if(in_array($key, ['created_at', 'updated_at'])){
+			if (in_array($key, ['created_at', 'updated_at', 'deleted_at', 'uuid'])) {
+				if (in_array($key, ['created_at', 'updated_at'])) {
 					$this->assertNotEmpty($expectedData[$key], "Expected timestamp field '{$key}' to have a value.");
 					$this->assertMatchesRegularExpression(
 						'/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
 						$expectedData[$key],
 						"Expected timestamp field '{$key}' to match datetime format."
 					);
-				}else{
+				} elseif ($key === 'uuid') {
+					$this->assertMatchesRegularExpression(
+						'/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
+						$expectedData[$key],
+						"Expected field 'uuid' to be a valid UUID."
+					);
+				} else {
 					$this->assertEmpty($expectedData[$key], "Expected timestamp field '{$key}' to be empty.");
 				}
 				continue;

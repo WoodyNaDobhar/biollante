@@ -149,11 +149,8 @@ class {{ $config->modelNames->name }}ApiTest extends TestCase
 				'/{{ $config->apiPrefix }}/{{ $config->modelNames->dashedPlural }}/'.${{ $config->modelNames->camel }}->{{ $config->primaryName }}
 			);
 
-			if($this->response->getData()->success == 0 && $this->response->getStatusCode() == 400){
-				$this->assertEquals(1, 2, $this->response['message']);
-			}
-
 			$this->response->assertStatus(404);
+			$this->response->assertJson(['success' => false]);
 			{{ $config->modelNames->name }}::where('id', ${{ $config->modelNames->camel }}->id)->withTrashed()->forceDelete();
 		});
 	}

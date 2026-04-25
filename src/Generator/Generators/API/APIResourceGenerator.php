@@ -79,7 +79,18 @@ class APIResourceGenerator extends BaseGenerator
 
 	private function formatField($fieldName){
 		if (str_ends_with($fieldName, '_at')) {
-			return "'{$fieldName}' => \$this->{$fieldName} ? \$this->{$fieldName}->format('Y-m-d H:i:s') : null";
+			$dbType = null;
+			foreach ($this->config->fields as $f) {
+				if ($f->name === $fieldName) {
+					$dbType = $f->dbType ?? null;
+					break;
+				}
+			}
+			if ($dbType === 'time') {
+				return "'{$fieldName}' => \$this->{$fieldName} ? \$this->{$fieldName}->format('H:i:s') : null";
+			} else {
+				return "'{$fieldName}' => \$this->{$fieldName} ? \$this->{$fieldName}->format('Y-m-d H:i:s') : null";
+			}
 		} elseif (str_ends_with($fieldName, '_on')) {
 			return "'{$fieldName}' => \$this->{$fieldName} ? \$this->{$fieldName}->format('Y-m-d') : null";
 		}

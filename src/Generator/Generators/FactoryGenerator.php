@@ -146,6 +146,8 @@ class FactoryGenerator extends BaseGenerator
 				$fieldData .= 1;
 			} elseif (in_array($field->name, $relations)) {
 				$fieldData .= $this->getValidRelation($field->name);
+			} elseif (strtolower($field->name) === 'uuid') {
+				$fieldData .= '$this->faker->uuid';
 			} else {
 				// Generate faker data based on field type
 				switch (strtolower($field->fieldDetails->type)) {

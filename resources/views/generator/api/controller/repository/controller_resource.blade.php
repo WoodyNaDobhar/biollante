@@ -135,7 +135,7 @@ class {{ $config->modelNames->name }}APIController extends AppBaseController
 		
 			$this->authorize('delete', ${{ $config->modelNames->camel }});
 
-			$this->{{ $config->modelNames->camel }}Repository->delete($id);
+			$this->{{ $config->modelNames->camel }}Repository->delete(${{ $config->modelNames->camel }}->id);
 
 			return $this->sendSuccess('{{ $config->modelNames->human }} deleted successfully.');
 		} catch (Throwable $e) {

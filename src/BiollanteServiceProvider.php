@@ -5,6 +5,8 @@ namespace Biollante;
 use Biollante\Console\Commands\ScaffoldCommand;
 use Biollante\Contracts\ScopeResolver;
 use Illuminate\Support\ServiceProvider;
+use Biollante\Http\Middleware\HandleApiNotFound;
+use Illuminate\Routing\Router;
 
 class BiollanteServiceProvider extends ServiceProvider
 {
@@ -29,6 +31,11 @@ class BiollanteServiceProvider extends ServiceProvider
 	public function boot(): void
 	{
 		$this->loadViewsFrom(__DIR__ . '/../resources/views', 'biollante');
+
+		$router = $this->app->make(Router::class);
+		if ($router->hasMiddlewareGroup('api')) {
+			$router->pushMiddlewareToGroup('api', HandleApiNotFound::class);
+		}
 
 		if ($this->app->runningInConsole()) {
 			$this->publishes([
